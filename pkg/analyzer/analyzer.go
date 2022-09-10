@@ -248,7 +248,7 @@ func NewCommentMimic() *analysis.Analyzer {
 	)
 
 	return &analysis.Analyzer{
-		Name: "CommentMimic",
+		Name: "commentmimic",
 		//nolint:lll
 		Doc:      "Checks function/interface first words match the element name and exported element are commented",
 		Requires: []*analysis.Analyzer{inspect.Analyzer},
