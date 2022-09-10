@@ -1,0 +1,32 @@
+name: CI-testing
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+permissions:
+  contents: read
+jobs:
+  ci:
+    name: ci-testing
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+      - name: build
+        run: go build -v ./...
+      - name: get-gotestsum
+        run: go install gotest.tools/gotestsum
+      - name: test
+        run: gotestsum --jsonfile ./test-output.log -- --timeout 5m ./...
+      - name: upload-logs
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-logs
+          path: ./test-output.log
+          retention-days: 30
