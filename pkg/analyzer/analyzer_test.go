@@ -29,42 +29,42 @@ var flagProduct = []map[string]bool{
 	{
 		"comment-exported":     false,
 		"comment-all-exported": false,
-		"comment-interface":    false,
+		"comment-interfaces":   false,
 	},
 	{
 		"comment-exported":     false,
 		"comment-all-exported": false,
-		"comment-interface":    true,
+		"comment-interfaces":   true,
 	},
 	{
 		"comment-exported":     false,
 		"comment-all-exported": true,
-		"comment-interface":    false,
+		"comment-interfaces":   false,
 	},
 	{
 		"comment-exported":     false,
 		"comment-all-exported": true,
-		"comment-interface":    true,
+		"comment-interfaces":   true,
 	},
 	{
 		"comment-exported":     true,
 		"comment-all-exported": false,
-		"comment-interface":    false,
+		"comment-interfaces":   false,
 	},
 	{
 		"comment-exported":     true,
 		"comment-all-exported": false,
-		"comment-interface":    true,
+		"comment-interfaces":   true,
 	},
 	{
 		"comment-exported":     true,
 		"comment-all-exported": true,
-		"comment-interface":    false,
+		"comment-interfaces":   false,
 	},
 	{
 		"comment-exported":     true,
 		"comment-all-exported": true,
-		"comment-interface":    true,
+		"comment-interfaces":   true,
 	},
 }
 
