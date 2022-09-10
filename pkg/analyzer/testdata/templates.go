@@ -53,7 +53,7 @@ type (
 
 {{define "maybeComment"}}{{if len .}}{{template "comment" .}}{{end}}{{end}}
 
-{{define "commentMismatch"}}// want "first word of comment for element '{{- .Element -}}' should be '{{- .Element -}}' not '{{- .FirstWord -}}'"{{end}}
+{{define "commentMismatch"}}// want "first word of comment is '{{- .FirstWord -}}' instead of '{{- .Element -}}'" {{end}}
 
 {{define "commentMissing"}}// want "exported element '{{- .Element -}}' should be commented"{{end}}
 

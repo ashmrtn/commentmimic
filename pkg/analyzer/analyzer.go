@@ -13,7 +13,7 @@ import (
 
 const (
 	//nolint:lll
-	commentMismatchTmpl = "first word of comment for element '%s' should be '%[1]s' not '%s'"
+	commentMismatchTmpl = "first word of comment is '%s' instead of '%s'"
 	commentMissingTmpl  = "exported element '%s' should be commented"
 )
 
@@ -61,8 +61,8 @@ func checkCommentMismatch(
 	pass.Reportf(
 		comment.Pos(),
 		commentMismatchTmpl,
-		elementName,
 		firstWord,
+		elementName,
 	)
 }
 

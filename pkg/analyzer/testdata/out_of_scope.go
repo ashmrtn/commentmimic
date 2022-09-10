@@ -110,25 +110,25 @@ type (
 
 	EmptyComments = `package a
 
-  //  // want "first word of comment for element 'a' should be 'a' not ''"
+  //  // want "first word of comment is '' instead of 'a'"
   func a() bool {
     return false
   }
 
   type b struct {}
 
-  //  // want "first word of comment for element 'c' should be 'c' not ''"
+  //  // want "first word of comment is '' instead of 'c'"
   func (ab b) c() bool {
     return false
   }
 
-  //  // want "first word of comment for element 'd' should be 'd' not ''"
+  //  // want "first word of comment is '' instead of 'd'"
   func (ab *b) d() bool {
     return false
   }
 
   type e interface {
-    //  // want "first word of comment for element 'f' should be 'f' not ''"
+    //  // want "first word of comment is '' instead of 'f'"
     f() bool
   }
 `
