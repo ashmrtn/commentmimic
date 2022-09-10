@@ -1,6 +1,7 @@
 package analyzer
 
 import (
+	"flag"
 	"go/ast"
 	"go/token"
 	"strings"
@@ -13,6 +14,7 @@ import (
 const (
 	//nolint:lll
 	commentMismatchTmpl = "first word of comment for element '%s' should be '%[1]s' not '%s'"
+	commentMissingTmpl  = "exported element '%s' should be commented"
 )
 
 func checkComment(
@@ -29,6 +31,16 @@ func checkComment(
 		pass,
 		elementName,
 		comment,
+	)
+	checkExported(
+		pass,
+		commentExported,
+		commentAllExported,
+		elementName,
+		comment,
+		elementPos,
+		elementExported,
+		recvExported,
 	)
 }
 
@@ -52,6 +64,33 @@ func checkCommentMismatch(
 		elementName,
 		firstWord,
 	)
+}
+
+func checkExported(
+	pass *analysis.Pass,
+	commentExported bool,
+	commentAllExported bool,
+	elementName string,
+	comment *ast.CommentGroup,
+	elementPos token.Pos,
+	elementExported bool,
+	recvExported bool,
+) {
+	if comment != nil || !elementExported {
+		return
+	}
+
+	// Either we're commenting everything or the receiver is exported and we're
+	// only commenting things with exported receivers and elements.
+	if commentAllExported || (recvExported && commentExported) {
+		pass.Reportf(
+			elementPos,
+			commentMissingTmpl,
+			elementName,
+		)
+
+		return
+	}
 }
 
 func (m mimic) checkFuncDecl(pass *analysis.Pass, fun *ast.FuncDecl) {
@@ -178,16 +217,42 @@ func (m mimic) run(pass *analysis.Pass) (any, error) {
 }
 
 type mimic struct {
+	commentExportedFuncs    bool
+	commentAllExportedFuncs bool
+	commentInterfaces       bool
 }
 
 func NewCommentMimic() *analysis.Analyzer {
 	m := mimic{}
+
+	fs := flag.NewFlagSet("CommentMimicFlags", flag.ExitOnError)
+	fs.BoolVar(
+		&m.commentExportedFuncs,
+		"comment-exported",
+		false,
+		"require comments on exported functions if their receiver is also exported",
+	)
+
+	fs.BoolVar(
+		&m.commentAllExportedFuncs,
+		"comment-all-exported",
+		true,
+		"require comments on all exported functions",
+	)
+
+	fs.BoolVar(
+		&m.commentInterfaces,
+		"comment-interfaces",
+		true,
+		"require comments on all exported interfaces",
+	)
 
 	return &analysis.Analyzer{
 		Name: "CommentMimic",
 		//nolint:lll
 		Doc:      "Checks function/interface first words match the element name and exported element are commented",
 		Requires: []*analysis.Analyzer{inspect.Analyzer},
+		Flags:    *fs,
 		Run: func(pass *analysis.Pass) (any, error) {
 			return m.run(pass)
 		},
