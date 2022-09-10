@@ -21,7 +21,7 @@ jobs:
       - name: build
         run: go build -v ./...
       - name: get-gotestsum
-        run: go get gotest.tools/gotestsum
+        run: go install gotest.tools/gotestsum
       - name: test
         run: gotestsum --jsonfile ./test-output.log -- --timeout 5m ./...
       - name: upload-logs
