@@ -13,8 +13,8 @@ import (
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/tools/go/analysis/analysistest"
 
-	"github.com/ashmrtn/commenter/pkg/analyzer"
-	"github.com/ashmrtn/commenter/pkg/analyzer/testdata"
+	"github.com/ashmrtn/commentmimic/pkg/analyzer"
+	"github.com/ashmrtn/commentmimic/pkg/analyzer/testdata"
 )
 
 const (

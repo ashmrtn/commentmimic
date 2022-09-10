@@ -16,7 +16,7 @@ linters-settings:
     sections:
       - standard
       - default
-      - prefix(github.com/ashmrtn/commenter)
+      - prefix(github.com/ashmrtn/commentmimic)
   lll:
     line-length: 80
   revive:

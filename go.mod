@@ -1,4 +1,4 @@
-module github.com/ashmrtn/commenter
+module github.com/ashmrtn/commentmimic
 
 go 1.18
 
