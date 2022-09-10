@@ -29,3 +29,4 @@ jobs:
         with:
           name: test-logs
           path: ./test-output.log
+          retention-days: 30
