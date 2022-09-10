@@ -473,6 +473,8 @@ func executeCommentMimicWithAllFlagCombos(
 	defer cleanup()
 
 	for _, flags := range flagProduct {
+		flags := flags
+
 		t.Run(flagsToTestName(flags), func(t1 *testing.T) {
 			executeMimicWithFlagsOnFiles(t1, flags, dir)
 		})
@@ -512,7 +514,11 @@ func TestCommentMimic(t *testing.T) {
 
 func (s *CommentMimicSuite) TestDoesNotErrorOnOutOfScope() {
 	for _, flags := range flagProduct {
+		flags := flags
+
 		s.T().Run(flagsToTestName(flags), func(t *testing.T) {
+			t.Parallel()
+
 			fileMap := map[string]string{
 				"a/a.go": testdata.OutOfScopePatterns,
 			}
@@ -535,6 +541,8 @@ func (s *CommentMimicSuite) TestDoesNotErrorOnOutOfScope() {
 
 func (s *CommentMimicSuite) TestHandlesEmptyComments() {
 	t := s.T()
+	t.Parallel()
+
 	fileMap := map[string]string{
 		"a/a.go": testdata.EmptyComments,
 	}
@@ -557,9 +565,17 @@ func (s *CommentMimicSuite) TestFuncCommentErrors() {
 	all := genFunctionCasesWithExports(base, receiver)
 
 	for name, tests := range all {
+		name := name
+		tests := tests
+
 		s.T().Run(name, func(t1 *testing.T) {
+			t1.Parallel()
+
 			for _, test := range tests {
+				test := test
+
 				t1.Run(test.name, func(t *testing.T) {
+					t.Parallel()
 					executeCommentMimicWithAllFlagCombos(
 						t,
 						s.tmpl,
@@ -623,13 +639,24 @@ func (s *CommentMimicSuite) TestInterfaceCommentErrors() {
 	}
 
 	for _, pattern := range patterns {
+		pattern := pattern
+
 		s.T().Run(pattern.name, func(t1 *testing.T) {
+			t1.Parallel()
+
 			for _, test := range table {
+				test := test
 				test.Confusing = pattern.confusing
 
 				t1.Run(test.name, func(t2 *testing.T) {
+					t2.Parallel()
+
 					for _, funcPattern := range funcPatterns {
+						funcPattern := funcPattern
+
 						t2.Run(funcPattern.name, func(t3 *testing.T) {
+							t3.Parallel()
+
 							if !funcPattern.hasFunc {
 								// Interface with no functions.
 								executeCommentMimicWithAllFlagCombos(
@@ -644,7 +671,11 @@ func (s *CommentMimicSuite) TestInterfaceCommentErrors() {
 
 							// Interface with functions.
 							for _, funcCase := range funcs {
+								funcCase := funcCase
+
 								t3.Run(funcCase.name, func(t *testing.T) {
+									t.Parallel()
+
 									funcCase.Confusing = funcPattern.confusing
 									test.InterfaceFunc = &funcCase
 
@@ -752,9 +783,17 @@ func (s *CommentMimicSuite) TestCommentAccessibleExportedFuncs() {
 	}
 
 	for name, caseList := range cases {
+		name := name
+		caseList := caseList
+
 		s.T().Run(name, func(t1 *testing.T) {
+			t1.Parallel()
+
 			for _, test := range caseList {
+				test := test
+
 				t1.Run(test.name, func(t *testing.T) {
+					t.Parallel()
 					executeCommentMimic(
 						t,
 						s.tmpl,
@@ -868,11 +907,23 @@ func (s *CommentMimicSuite) TestCommentAllExportedFuncs() {
 	}
 
 	for _, flags := range flagSets {
+		flags := flags
+
 		s.T().Run(flagsToTestName(flags), func(t1 *testing.T) {
+			t1.Parallel()
+
 			for name, caseList := range cases {
+				name := name
+				caseList := caseList
+
 				t1.Run(name, func(t2 *testing.T) {
+					t2.Parallel()
+
 					for _, test := range caseList {
+						test := test
+
 						t2.Run(test.name, func(t *testing.T) {
+							t.Parallel()
 							executeCommentMimic(
 								t,
 								s.tmpl,
@@ -956,9 +1007,17 @@ func (s *CommentMimicSuite) TestCommentExportedEmptyInterfaces() {
 	)
 
 	for name, caseList := range cases {
+		name := name
+		caseList := caseList
+
 		s.T().Run(name, func(t1 *testing.T) {
+			t1.Parallel()
+
 			for _, test := range caseList {
+				test := test
+
 				t1.Run(test.name, func(t *testing.T) {
+					t.Parallel()
 					executeCommentMimic(
 						t,
 						s.tmpl,
