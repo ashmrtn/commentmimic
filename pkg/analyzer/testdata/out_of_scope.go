@@ -1,6 +1,7 @@
 package testdata
 
-const OutOfScopePatterns = `package a
+const (
+	OutOfScopePatterns = `package a
 
 /*
 Var declarations -- should be ignored in all cases.
@@ -106,3 +107,29 @@ type (
   BlockEquivalenceExportedWrongComment int
 )
 `
+
+	EmptyComments = `package a
+
+  //  // want "first word of comment for element 'a' should be 'a' not ''"
+  func a() bool {
+    return false
+  }
+
+  type b struct {}
+
+  //  // want "first word of comment for element 'c' should be 'c' not ''"
+  func (ab b) c() bool {
+    return false
+  }
+
+  //  // want "first word of comment for element 'd' should be 'd' not ''"
+  func (ab *b) d() bool {
+    return false
+  }
+
+  type e interface {
+    //  // want "first word of comment for element 'f' should be 'f' not ''"
+    f() bool
+  }
+`
+)

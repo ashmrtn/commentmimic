@@ -533,6 +533,22 @@ func (s *CommentMimicSuite) TestDoesNotErrorOnOutOfScope() {
 	}
 }
 
+func (s *CommentMimicSuite) TestHandlesEmptyComments() {
+	t := s.T()
+	fileMap := map[string]string{
+		"a/a.go": testdata.EmptyComments,
+	}
+
+	dir, cleanup, err := analysistest.WriteFiles(fileMap)
+	require.NoError(t, err)
+
+	defer cleanup()
+
+	mimic := analyzer.NewCommentMimic()
+
+	analysistest.Run(t, dir, mimic, "a")
+}
+
 func (s *CommentMimicSuite) TestFuncCommentErrors() {
 	element := "element"
 	base := generateCommentMimicCases(element)
