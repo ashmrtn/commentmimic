@@ -1,0 +1,26 @@
+! exec commentmimic errors.go
+
+-- errors.go --
+package errors
+
+type iface interface {
+  // This is some function with a comment.
+  IfaceFunc() bool
+}
+
+type testStruct struct {}
+
+// This is some function with a comment.
+func (t testStruct) funcA() bool {
+  return false
+}
+
+// This is some function with a comment.
+func (t *testStruct) funcB() bool {
+  return false
+}
+
+// This is some function with a comment.
+func funcC() bool {
+  return false
+}
