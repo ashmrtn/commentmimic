@@ -236,14 +236,14 @@ func NewCommentMimic() *analysis.Analyzer {
 	fs.BoolVar(
 		&m.commentAllExportedFuncs,
 		"comment-all-exported",
-		true,
+		false,
 		"require comments on all exported functions",
 	)
 
 	fs.BoolVar(
 		&m.commentInterfaces,
 		"comment-interfaces",
-		true,
+		false,
 		"require comments on all exported interfaces",
 	)
 
