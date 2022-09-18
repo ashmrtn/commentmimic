@@ -47,13 +47,33 @@ type (
 {{if .InterfaceFunc.Confusing}}  testConfusingInterfaceFunc2() bool{{end}}{{end}}
 }{{end}}
 
-{{define "comment"}}// {{ . }} has a comment.{{end}}
+{{define "regularComment"}}// {{ .Text }} has a comment.{{if .Multiline}}
+// This is another line of comment text.{{end}}{{end}}
 
-{{define "maybeCommentWithError"}}{{if len .FirstWord}}{{template "comment" .FirstWord}}{{if .CommentError}} {{template "commentMismatch" .}}{{end}}{{end}}{{end}}
+{{define "blockCommentInline"}}/* {{ .Text }} has a comment.{{if .Multiline}}
+This is another line of comment text.{{end}} */{{end}}
 
-{{define "maybeComment"}}{{if len .}}{{template "comment" .}}{{end}}{{end}}
+{{define "blockCommentMultiline"}}/*
+{{ .Text }} has a comment.{{if .Multiline}}
+This is another line of comment text.{{end}}
+*/{{end}}
 
-{{define "commentMismatch"}}// want "first word of comment is '{{- .FirstWord -}}' instead of '{{- .Element -}}'" {{end}}
+{{define "maybeCommentWithError"}}{{if .FirstWord.Text}}{{if eq .FirstWord.Type.String "InlineComment"}}{{template "regularCommentWithError" .}}{{else if eq .FirstWord.Type.String "BlockInlineComment"}}{{template "blockCommentInlineWithError" .}}{{else}}{{template "blockCommentMultilineWithError" .}}{{end}}{{end}}{{end}}
+
+{{define "maybeComment"}}{{if .Text}}{{if eq .Type.String "InlineComment"}}{{template "regularComment" .}}{{else if eq .Type.String "BlockInlineComment"}}{{template "blockCommentInline" .}}{{else}}{{template "blockCommentMultiline" .}}{{end}}{{end}}{{end}}
+
+{{define "regularCommentWithError"}}// {{ .FirstWord.Text }} has a comment.{{if .CommentError}} {{template "commentMismatch" .}}{{end}}{{if .FirstWord.Multiline}}
+// This is another line of comment text.{{end}}{{end}}
+
+{{define "blockCommentInlineWithError"}}/*{{ .FirstWord.Text}} has a comment.{{if .FirstWord.Multiline}}
+This is another line of comment text.{{end}}{{if .CommentError}} {{template "commentMismatch" .}}{{end}} */{{end}}
+
+{{define "blockCommentMultilineWithError"}}/*
+{{ .FirstWord.Text }} has a comment.{{if .FirstWord.Multiline}}
+This is another line of comment text.{{end}}{{if .CommentError}} {{template "commentMismatch" .}}{{end}}
+*/{{end}}
+
+{{define "commentMismatch"}}// want "first word of comment is '{{- .FirstWord.Text -}}' instead of '{{- .Element -}}'" {{end}}
 
 {{define "commentMissing"}}// want "exported element '{{- .Element -}}' should be commented"{{end}}
 

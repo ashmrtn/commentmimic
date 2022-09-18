@@ -17,6 +17,9 @@ import (
 	"github.com/ashmrtn/commentmimic/pkg/analyzer/testdata"
 )
 
+// TODO(ashmrtn): Figure out how to handle these as leading spaces seem to
+// count as a character and make the linter unhappy.
+
 const (
 	lower = true
 	upper = !lower
@@ -73,6 +76,12 @@ var (
 	}
 )
 
+type commentData struct {
+	Type      testdata.CommentType
+	Text      string
+	Multiline bool
+}
+
 type templateData struct {
 	// Name of the test case.
 	name string
@@ -83,7 +92,7 @@ type templateData struct {
 	// comment. If firstWord is empty then neither the comment nor the error check
 	// will be output.
 	CommentError bool
-	FirstWord    string
+	FirstWord    commentData
 
 	// Name of the element and whether an error should be reported for the
 	// element, often if it is missing a comment.
@@ -93,7 +102,7 @@ type templateData struct {
 	// Extra info that may be affected by flags or used to try to confuse the
 	// linter.
 	Receiver                string
-	InterfaceBlockFirstWord string
+	InterfaceBlockFirstWord commentData
 
 	// Inner information for an interface; whether it should have other stuff
 	// around it and if it has functions.
