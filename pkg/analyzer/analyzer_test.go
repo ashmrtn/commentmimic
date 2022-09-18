@@ -588,12 +588,9 @@ func (s *CommentMimicSuite) TestFuncCommentErrors() {
 	}
 }
 
-func (s *CommentMimicSuite) TestInterfaceCommentErrors() {
+func (s *CommentMimicSuite) TestEmptyInterfaceCommentErrors() {
 	element := "element"
 	table := generateCommentMimicCases(element)
-	elementFunc := "elementFunc"
-	funcs := generateCommentMimicCases(elementFunc)
-
 	patterns := []struct {
 		name      string
 		template  string
@@ -616,16 +613,87 @@ func (s *CommentMimicSuite) TestInterfaceCommentErrors() {
 		},
 	}
 
+	for _, pattern := range patterns {
+		s.T().Run(pattern.name, func(t1 *testing.T) {
+			pattern := pattern
+
+			t1.Parallel()
+
+			for _, test := range table {
+				test := test
+
+				t1.Run(test.name, func(t *testing.T) {
+					t.Parallel()
+
+					test.template = pattern.template
+					test.Confusing = pattern.confusing
+
+					executeCommentMimicWithAllFlagCombos(
+						t,
+						s.tmpl,
+						test.template,
+						test,
+					)
+				})
+			}
+		})
+	}
+}
+
+func (s *CommentMimicSuite) TestInterfaceFuncCommentErrors() {
+	element := "element"
+	elementFunc := "elementFunc"
+	funcs := generateCommentMimicCases(elementFunc)
+
+	patterns := []struct {
+		name      string
+		template  string
+		exported  bool
+		confusing bool
+	}{
+		{
+			name:      "UnexportedInterface",
+			template:  "Interface",
+			exported:  false,
+			confusing: false,
+		},
+		{
+			name:      "ExportedInterface",
+			template:  "Interface",
+			exported:  true,
+			confusing: false,
+		},
+		{
+			name:      "BlockOneUnexportedInterface",
+			template:  "BlockInterface",
+			exported:  false,
+			confusing: false,
+		},
+		{
+			name:      "BlockOneExportedInterface",
+			template:  "BlockInterface",
+			exported:  true,
+			confusing: false,
+		},
+		{
+			name:      "BlockSeveralUnexportedInterfaces",
+			template:  "BlockInterface",
+			exported:  false,
+			confusing: true,
+		},
+		{
+			name:      "BlockSeveralExportedInterfaces",
+			template:  "BlockInterface",
+			exported:  true,
+			confusing: true,
+		},
+	}
+
 	funcPatterns := []struct {
 		name      string
 		hasFunc   bool
 		confusing bool
 	}{
-		{
-			name:      "NoFunc",
-			hasFunc:   false,
-			confusing: false,
-		},
 		{
 			name:      "OneFunc",
 			hasFunc:   true,
@@ -644,49 +712,40 @@ func (s *CommentMimicSuite) TestInterfaceCommentErrors() {
 		s.T().Run(pattern.name, func(t1 *testing.T) {
 			t1.Parallel()
 
-			for _, test := range table {
-				test := test
-				test.Confusing = pattern.confusing
+			elementName := lowerWord(element)
+			if pattern.exported {
+				elementName = capWord(element)
+			}
 
-				t1.Run(test.name, func(t2 *testing.T) {
+			test := templateData{
+				template:  pattern.template,
+				Element:   elementName,
+				FirstWord: elementName,
+				Confusing: pattern.confusing,
+			}
+
+			for _, funcPattern := range funcPatterns {
+				funcPattern := funcPattern
+
+				t1.Run(funcPattern.name, func(t2 *testing.T) {
 					t2.Parallel()
 
-					for _, funcPattern := range funcPatterns {
-						funcPattern := funcPattern
+					// Interface with functions.
+					for _, funcCase := range funcs {
+						funcCase := funcCase
 
-						t2.Run(funcPattern.name, func(t3 *testing.T) {
-							t3.Parallel()
+						t2.Run(funcCase.name, func(t *testing.T) {
+							t.Parallel()
 
-							if !funcPattern.hasFunc {
-								// Interface with no functions.
-								executeCommentMimicWithAllFlagCombos(
-									t3,
-									s.tmpl,
-									pattern.template,
-									test,
-								)
+							funcCase.Confusing = funcPattern.confusing
+							test.InterfaceFunc = &funcCase
 
-								return
-							}
-
-							// Interface with functions.
-							for _, funcCase := range funcs {
-								funcCase := funcCase
-
-								t3.Run(funcCase.name, func(t *testing.T) {
-									t.Parallel()
-
-									funcCase.Confusing = funcPattern.confusing
-									test.InterfaceFunc = &funcCase
-
-									executeCommentMimicWithAllFlagCombos(
-										t,
-										s.tmpl,
-										pattern.template,
-										test,
-									)
-								})
-							}
+							executeCommentMimicWithAllFlagCombos(
+								t,
+								s.tmpl,
+								test.template,
+								test,
+							)
 						})
 					}
 				})
