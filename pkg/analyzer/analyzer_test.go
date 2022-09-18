@@ -25,48 +25,53 @@ const (
 	unexported = !exported
 )
 
-var flagProduct = []map[string]bool{
-	{
-		"comment-exported":     false,
-		"comment-all-exported": false,
-		"comment-interfaces":   false,
-	},
-	{
-		"comment-exported":     false,
-		"comment-all-exported": false,
-		"comment-interfaces":   true,
-	},
-	{
-		"comment-exported":     false,
-		"comment-all-exported": true,
-		"comment-interfaces":   false,
-	},
-	{
-		"comment-exported":     false,
-		"comment-all-exported": true,
-		"comment-interfaces":   true,
-	},
-	{
-		"comment-exported":     true,
-		"comment-all-exported": false,
-		"comment-interfaces":   false,
-	},
-	{
-		"comment-exported":     true,
-		"comment-all-exported": false,
-		"comment-interfaces":   true,
-	},
-	{
-		"comment-exported":     true,
-		"comment-all-exported": true,
-		"comment-interfaces":   false,
-	},
-	{
-		"comment-exported":     true,
-		"comment-all-exported": true,
-		"comment-interfaces":   true,
-	},
-}
+var (
+	fileTmpl = template.Must(
+		template.New("fileGenerator").Parse(testdata.FileGenTmpls),
+	)
+	flagProduct = []map[string]bool{
+		{
+			"comment-exported":     false,
+			"comment-all-exported": false,
+			"comment-interfaces":   false,
+		},
+		{
+			"comment-exported":     false,
+			"comment-all-exported": false,
+			"comment-interfaces":   true,
+		},
+		{
+			"comment-exported":     false,
+			"comment-all-exported": true,
+			"comment-interfaces":   false,
+		},
+		{
+			"comment-exported":     false,
+			"comment-all-exported": true,
+			"comment-interfaces":   true,
+		},
+		{
+			"comment-exported":     true,
+			"comment-all-exported": false,
+			"comment-interfaces":   false,
+		},
+		{
+			"comment-exported":     true,
+			"comment-all-exported": false,
+			"comment-interfaces":   true,
+		},
+		{
+			"comment-exported":     true,
+			"comment-all-exported": true,
+			"comment-interfaces":   false,
+		},
+		{
+			"comment-exported":     true,
+			"comment-all-exported": true,
+			"comment-interfaces":   true,
+		},
+	}
+)
 
 type templateData struct {
 	// Name of the test case.
@@ -498,14 +503,6 @@ func executeCommentMimic(
 
 type CommentMimicSuite struct {
 	suite.Suite
-	tmpl *template.Template
-}
-
-func (s *CommentMimicSuite) SetupSuite() {
-	tmpl, err := template.New("fileGenerator").Parse(testdata.FileGenTmpls)
-	require.NoError(s.T(), err)
-
-	s.tmpl = tmpl
 }
 
 func TestCommentMimic(t *testing.T) {
@@ -578,7 +575,7 @@ func (s *CommentMimicSuite) TestFuncCommentErrors() {
 					t.Parallel()
 					executeCommentMimicWithAllFlagCombos(
 						t,
-						s.tmpl,
+						fileTmpl,
 						test.template,
 						test,
 					)
@@ -630,7 +627,7 @@ func (s *CommentMimicSuite) TestEmptyInterfaceCommentErrors() {
 
 					executeCommentMimicWithAllFlagCombos(
 						t,
-						s.tmpl,
+						fileTmpl,
 						test.template,
 						test,
 					)
@@ -742,7 +739,7 @@ func (s *CommentMimicSuite) TestInterfaceFuncCommentErrors() {
 
 							executeCommentMimicWithAllFlagCombos(
 								t,
-								s.tmpl,
+								fileTmpl,
 								test.template,
 								test,
 							)
@@ -855,7 +852,7 @@ func (s *CommentMimicSuite) TestCommentAccessibleExportedFuncs() {
 					t.Parallel()
 					executeCommentMimic(
 						t,
-						s.tmpl,
+						fileTmpl,
 						test.template,
 						test,
 						flags,
@@ -985,7 +982,7 @@ func (s *CommentMimicSuite) TestCommentAllExportedFuncs() {
 							t.Parallel()
 							executeCommentMimic(
 								t,
-								s.tmpl,
+								fileTmpl,
 								test.template,
 								test,
 								flags,
@@ -1079,7 +1076,7 @@ func (s *CommentMimicSuite) TestCommentExportedEmptyInterfaces() {
 					t.Parallel()
 					executeCommentMimic(
 						t,
-						s.tmpl,
+						fileTmpl,
 						test.template,
 						test,
 						flags,
