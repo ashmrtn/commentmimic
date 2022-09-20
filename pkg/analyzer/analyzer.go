@@ -53,7 +53,15 @@ func checkCommentMismatch(
 		return
 	}
 
-	firstWord := strings.SplitN(comment.Text(), " ", 2)[0]
+	text := strings.TrimSpace(comment.Text())
+	words := strings.Fields(text)
+
+	// Set to empty if there's no non-whitespace characters in the comment.
+	firstWord := ""
+	if len(words) > 0 {
+		firstWord = words[0]
+	}
+
 	if firstWord == elementName {
 		return
 	}
