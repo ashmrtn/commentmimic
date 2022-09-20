@@ -68,7 +68,7 @@ the linter can no longer check if there's leading whitepace.
 Currently CommentMimic only checks interface and function comments. This may be
 expanded later on, but the [official pages](https://tip.golang.org/doc/comment)
 on golang doc comments don't explicitly state standards for comment formats. The
-struct comments written on that page consistently start with `A` or `An` but
-comments on `var` and `const` decalarations show much more variability in their
-format. Eventually CommentMimic may be expanded to cover struct comments as
-well, but support for others seems unlikely.
+type declaration comments written on that page consistently start with `A` or
+`An` but comments on `var` and `const` decalarations show much more variability
+in their format. Eventually CommentMimic may be expanded to cover type
+declaration comments as well, but support for others seems unlikely.
