@@ -17,9 +17,6 @@ import (
 	"github.com/ashmrtn/commentmimic/pkg/analyzer/testdata"
 )
 
-// TODO(ashmrtn): Figure out how to handle these as leading spaces seem to
-// count as a character and make the linter unhappy.
-
 const (
 	lower = true
 	upper = !lower
@@ -227,9 +224,10 @@ func generateCommentMimicCases(name string) []templateData {
 
 	commentTypes := []testdata.CommentType{
 		testdata.InlineComment,
+		testdata.BlockInlineComment,
 		testdata.BlockMultilineComment,
 	}
-	res := make([]templateData, 0, 2*len(commentTypes)*len(base))
+	res := make([]templateData, 0, 3*len(commentTypes)*len(base))
 
 	for _, c := range base {
 		for _, t := range commentTypes {
