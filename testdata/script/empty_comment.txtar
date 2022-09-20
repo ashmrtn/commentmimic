@@ -1,0 +1,42 @@
+! exec commentmimic empty_comment.go
+stderr -count=6 'first word of comment is '''' instead of ''func[1-6]'''
+
+-- empty_comment.go --
+package empty_comment
+
+type testStruct struct {}
+
+//
+func (t testStruct) func1() bool {
+  return false
+}
+
+//  
+func (t testStruct) func2() bool {
+  return false
+}
+
+//	
+func (t testStruct) func3() bool {
+  return false
+}
+
+/*  */
+func (t testStruct) func4() bool {
+  return false
+}
+
+/*
+*/
+func (t testStruct) func5() bool {
+  return false
+}
+
+/*
+
+
+
+*/
+func (t testStruct) func6() bool {
+  return false
+}

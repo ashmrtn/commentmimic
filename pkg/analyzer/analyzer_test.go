@@ -73,6 +73,12 @@ var (
 	}
 )
 
+type commentData struct {
+	Type      testdata.CommentType
+	Text      string
+	Multiline bool
+}
+
 type templateData struct {
 	// Name of the test case.
 	name string
@@ -83,7 +89,7 @@ type templateData struct {
 	// comment. If firstWord is empty then neither the comment nor the error check
 	// will be output.
 	CommentError bool
-	FirstWord    string
+	FirstWord    commentData
 
 	// Name of the element and whether an error should be reported for the
 	// element, often if it is missing a comment.
@@ -93,7 +99,7 @@ type templateData struct {
 	// Extra info that may be affected by flags or used to try to confuse the
 	// linter.
 	Receiver                string
-	InterfaceBlockFirstWord string
+	InterfaceBlockFirstWord commentData
 
 	// Inner information for an interface; whether it should have other stuff
 	// around it and if it has functions.
@@ -167,42 +173,82 @@ func flagsToTestName(flags map[string]bool) string {
 }
 
 func generateCommentMimicCases(name string) []templateData {
-	return []templateData{
+	base := []templateData{
 		{
-			name:      "UnexportedNoError",
-			FirstWord: lowerWord(name),
-			Element:   lowerWord(name),
+			name: "UnexportedNoError",
+			FirstWord: commentData{
+				Text: lowerWord(name),
+			},
+			Element: lowerWord(name),
 		},
 		{
-			name:      "ExportedNoError",
-			FirstWord: capWord(name),
-			Element:   capWord(name),
+			name: "ExportedNoError",
+			FirstWord: commentData{
+				Text: capWord(name),
+			},
+			Element: capWord(name),
 		},
 		{
-			name:         "UnexportedWrongCase",
-			FirstWord:    capWord(name),
+			name: "UnexportedWrongCase",
+			FirstWord: commentData{
+				Text: capWord(name),
+			},
 			Element:      lowerWord(name),
 			CommentError: true,
 		},
 		{
-			name:         "ExportedWrongCase",
-			FirstWord:    lowerWord(name),
+			name: "ExportedWrongCase",
+			FirstWord: commentData{
+				Text: lowerWord(name),
+			},
 			Element:      capWord(name),
 			CommentError: true,
 		},
 		{
-			name:         "UnexportedPostfixWord",
-			FirstWord:    lowerWord(name) + "a",
+			name: "UnexportedPostfixWord",
+			FirstWord: commentData{
+				Text: lowerWord(name) + "a",
+			},
 			Element:      lowerWord(name),
 			CommentError: true,
 		},
 		{
-			name:         "ExportedPostfixWord",
-			FirstWord:    capWord(name) + "a",
+			name: "ExportedPostfixWord",
+			FirstWord: commentData{
+				Text: capWord(name) + "a",
+			},
 			Element:      capWord(name),
 			CommentError: true,
 		},
 	}
+
+	commentTypes := []testdata.CommentType{
+		testdata.InlineComment,
+		testdata.BlockInlineComment,
+		testdata.BlockMultilineComment,
+	}
+	res := make([]templateData, 0, 3*len(commentTypes)*len(base))
+
+	for _, c := range base {
+		for _, t := range commentTypes {
+			for _, multiline := range []bool{false, true} {
+				tmp := c
+				tmp.FirstWord.Type = t
+				tmp.FirstWord.Multiline = multiline
+				tmp.name += t.String()
+
+				if multiline {
+					tmp.name += "Multiline"
+				} else {
+					tmp.name += "SingleLine"
+				}
+
+				res = append(res, tmp)
+			}
+		}
+	}
+
+	return res
 }
 
 // genFunctionCases takes a set of partially populated test cases and returns a
@@ -536,12 +582,11 @@ func (s *CommentMimicSuite) TestDoesNotErrorOnOutOfScope() {
 	}
 }
 
-func (s *CommentMimicSuite) TestHandlesEmptyComments() {
+func (s *CommentMimicSuite) TestHandlesExtraWhitespace() {
 	t := s.T()
-	t.Parallel()
 
 	fileMap := map[string]string{
-		"a/a.go": testdata.EmptyComments,
+		"a/a.go": testdata.ExtraWhitespace,
 	}
 
 	dir, cleanup, err := analysistest.WriteFiles(fileMap)
@@ -550,7 +595,6 @@ func (s *CommentMimicSuite) TestHandlesEmptyComments() {
 	defer cleanup()
 
 	mimic := analyzer.NewCommentMimic()
-
 	analysistest.Run(t, dir, mimic, "a")
 }
 
@@ -715,9 +759,12 @@ func (s *CommentMimicSuite) TestInterfaceFuncCommentErrors() {
 			}
 
 			test := templateData{
-				template:  pattern.template,
-				Element:   elementName,
-				FirstWord: elementName,
+				template: pattern.template,
+				Element:  elementName,
+				FirstWord: commentData{
+					Type: testdata.InlineComment,
+					Text: elementName,
+				},
 				Confusing: pattern.confusing,
 			}
 
@@ -769,13 +816,19 @@ func (s *CommentMimicSuite) TestCommentAccessibleExportedFuncs() {
 
 		funcCases = []templateData{
 			{
-				name:      "NoError",
-				FirstWord: capWord(element),
-				Element:   capWord(element),
+				name: "NoError",
+				FirstWord: commentData{
+					Type: testdata.InlineComment,
+					Text: capWord(element),
+				},
+				Element: capWord(element),
 			},
 			{
-				name:         "MimicError",
-				FirstWord:    "foo",
+				name: "MimicError",
+				FirstWord: commentData{
+					Type: testdata.InlineComment,
+					Text: "foo",
+				},
 				CommentError: true,
 				Element:      capWord(element),
 			},
@@ -890,13 +943,19 @@ func (s *CommentMimicSuite) TestCommentAllExportedFuncs() {
 
 		funcCases = []templateData{
 			{
-				name:      "NoError",
-				FirstWord: capWord(element),
-				Element:   capWord(element),
+				name: "NoError",
+				FirstWord: commentData{
+					Type: testdata.InlineComment,
+					Text: capWord(element),
+				},
+				Element: capWord(element),
 			},
 			{
-				name:         "MimicError",
-				FirstWord:    "foo",
+				name: "MimicError",
+				FirstWord: commentData{
+					Type: testdata.InlineComment,
+					Text: "foo",
+				},
 				CommentError: true,
 				Element:      capWord(element),
 			},
@@ -1007,13 +1066,19 @@ func (s *CommentMimicSuite) TestCommentExportedEmptyInterfaces() {
 
 		ifaceCases = []templateData{
 			{
-				name:      "NoError",
-				FirstWord: capWord(iface),
-				Element:   capWord(iface),
+				name: "NoError",
+				FirstWord: commentData{
+					Type: testdata.InlineComment,
+					Text: capWord(iface),
+				},
+				Element: capWord(iface),
 			},
 			{
-				name:         "MimicError",
-				FirstWord:    "foo",
+				name: "MimicError",
+				FirstWord: commentData{
+					Type: testdata.InlineComment,
+					Text: "foo",
+				},
 				CommentError: true,
 				Element:      capWord(iface),
 			},
@@ -1054,11 +1119,14 @@ func (s *CommentMimicSuite) TestCommentExportedEmptyInterfaces() {
 	cases["OneBlockExportedInterface"] = append(
 		cases["OneBlockExportedInterface"],
 		templateData{
-			name:                    "ErrorCommentedBlock",
-			template:                "BlockInterface",
-			Element:                 capWord(iface),
-			ElementError:            true,
-			InterfaceBlockFirstWord: capWord(iface),
+			name:         "ErrorCommentedBlock",
+			template:     "BlockInterface",
+			Element:      capWord(iface),
+			ElementError: true,
+			InterfaceBlockFirstWord: commentData{
+				Type: testdata.InlineComment,
+				Text: capWord(iface),
+			},
 		},
 	)
 
