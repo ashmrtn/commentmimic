@@ -584,12 +584,11 @@ func (s *CommentMimicSuite) TestDoesNotErrorOnOutOfScope() {
 	}
 }
 
-func (s *CommentMimicSuite) TestHandlesEmptyComments() {
+func (s *CommentMimicSuite) TestHandlesExtraWhitespace() {
 	t := s.T()
-	t.Parallel()
 
 	fileMap := map[string]string{
-		"a/a.go": testdata.EmptyComments,
+		"a/a.go": testdata.ExtraWhitespace,
 	}
 
 	dir, cleanup, err := analysistest.WriteFiles(fileMap)
@@ -598,7 +597,6 @@ func (s *CommentMimicSuite) TestHandlesEmptyComments() {
 	defer cleanup()
 
 	mimic := analyzer.NewCommentMimic()
-
 	analysistest.Run(t, dir, mimic, "a")
 }
 

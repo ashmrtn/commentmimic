@@ -132,4 +132,34 @@ type (
     f() bool
   }
 `
+
+	ExtraWhitespace = `package a
+
+// 	Element0 has a comment.
+func Element0() bool {
+  return false
+}
+
+/*
+	Element1 has a comment.
+*/
+func Element1() bool {
+  return false
+}
+
+/*
+Element2
+has a comment.
+*/
+func Element2() bool {
+  return false
+}
+
+/*
+Element3	has a comment.
+*/
+func Element3() bool {
+  return false
+}
+`
 )
