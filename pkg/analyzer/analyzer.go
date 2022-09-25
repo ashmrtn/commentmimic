@@ -132,7 +132,15 @@ func checkExported(
 	elementExported bool,
 	recvExported bool,
 ) {
-	if comment != nil || !elementExported {
+	commented := false
+	// We only want to report missing comments if we haven't already reported the
+	// comment is empty.
+	if comment != nil {
+		commented = len(comment.Text()) > 0 ||
+			!containsOnlyMachineReadableComment(comment)
+	}
+
+	if commented || !elementExported {
 		return
 	}
 
@@ -144,8 +152,6 @@ func checkExported(
 			commentMissingTmpl,
 			elementName,
 		)
-
-		return
 	}
 }
 
