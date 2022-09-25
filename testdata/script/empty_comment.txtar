@@ -1,5 +1,5 @@
 ! exec commentmimic empty_comment.go
-stderr -count=6 'first word of comment is '''' instead of ''func[1-6]'''
+stderr -count=6 'empty comment on ''func[1-6]'''
 
 -- empty_comment.go --
 package empty_comment
