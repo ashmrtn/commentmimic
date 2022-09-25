@@ -108,31 +108,6 @@ type (
 )
 `
 
-	EmptyComments = `package a
-
-  //  // want "first word of comment is '' instead of 'a'"
-  func a() bool {
-    return false
-  }
-
-  type b struct {}
-
-  //  // want "first word of comment is '' instead of 'c'"
-  func (ab b) c() bool {
-    return false
-  }
-
-  //  // want "first word of comment is '' instead of 'd'"
-  func (ab *b) d() bool {
-    return false
-  }
-
-  type e interface {
-    //  // want "first word of comment is '' instead of 'f'"
-    f() bool
-  }
-`
-
 	ExtraWhitespace = `package a
 
 // 	Element0 has a comment.
@@ -160,6 +135,77 @@ Element3	has a comment.
 */
 func Element3() bool {
   return false
+}
+`
+
+	EmptyComments = `package a
+
+//nolint:commentmimic
+func ignoreMachineReadable() bool {
+  return false
+}
+
+//nolint:commentmimic // want "first word of comment is 'This' instead of 'CommentMismatch'"
+// This function has a comment.
+func CommentMismatch() bool {
+  return false
+}
+
+//nolint:commentmimic
+//
+func EmptyComment() bool { // want "empty comment on 'EmptyComment'"
+  return false
+}
+
+//nolint:commentmimic
+//	
+func EmptyComment2() bool { // want "empty comment on 'EmptyComment2'"
+  return false
+}
+
+//nolint:commentmimic
+/*
+*/
+func EmptyComment3() bool { // want "empty comment on 'EmptyComment3'"
+  return false
+}
+
+//nolint:commentmimic
+/*
+   
+*/
+func EmptyComment4() bool { // want "empty comment on 'EmptyComment4'"
+  return false
+}
+`
+
+	MachineReadableExported = `package a
+
+//nolint:commentmimic
+func FreeFunc() bool { // want "exported element 'FreeFunc' should be commented"
+  return false
+}
+
+type testStruct struct {}
+
+//nolint:commentmimic
+func (t testStruct) PrivateReceiver() bool { // want "exported element 'PrivateReceiver' should be commented"
+  return false
+}
+
+//nolint:commentmimic
+func (t *testStruct) PrivatePtrReceiver() bool { // want "exported element 'PrivatePtrReceiver' should be commented"
+  return false
+}
+
+//nolint:commentmimic
+type TestInterface interface { // want "exported element 'TestInterface' should be commented"
+  ExportedInterfaceFunc() bool // want "exported element 'ExportedInterfaceFunc' should be commented"
+}
+
+//nolint:commentmimic
+type testIface interface {
+  UnexportedInterfaceFunc() bool // want "exported element 'UnexportedInterfaceFunc' should be commented"
 }
 `
 )

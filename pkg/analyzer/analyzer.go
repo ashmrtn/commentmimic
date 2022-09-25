@@ -14,6 +14,7 @@ import (
 const (
 	//nolint:lll
 	commentMismatchTmpl = "first word of comment is '%s' instead of '%s'"
+	commentEmptyTmpl    = "empty comment on '%s'"
 	commentMissingTmpl  = "exported element '%s' should be commented"
 )
 
@@ -31,6 +32,7 @@ func checkComment(
 		pass,
 		elementName,
 		comment,
+		elementPos,
 	)
 	checkExported(
 		pass,
@@ -44,17 +46,63 @@ func checkComment(
 	)
 }
 
+func extractSingleCommentText(input string) string {
+	// Comment of the form /**/.
+	if input[1] == '*' {
+		return input[2 : len(input)-2]
+	}
+
+	// comment of the form //.
+	return input[2:]
+}
+
+// containsOnlyMachineReadableComment returns true if the CommentGroup
+// contains only a machine-readable comment.
+func containsOnlyMachineReadableComment(comment *ast.CommentGroup) bool {
+	onlyMachine := true
+
+	for _, lc := range comment.List {
+		lineText := strings.TrimSpace(extractSingleCommentText(lc.Text))
+		// Machine-readable comment.
+		if len(lineText) > 0 {
+			continue
+		}
+
+		onlyMachine = false
+	}
+
+	return onlyMachine
+}
+
 func checkCommentMismatch(
 	pass *analysis.Pass,
 	elementName string,
 	comment *ast.CommentGroup,
+	elementPos token.Pos,
 ) {
 	if comment == nil {
 		return
 	}
 
-	text := strings.TrimSpace(comment.Text())
-	words := strings.Fields(text)
+	text := comment.Text()
+
+	// This comment could be a machine-readable comment of the form
+	// //something:else, an empty comment, or a comment containing only
+	// whitespace.
+	if len(text) == 0 {
+		if !containsOnlyMachineReadableComment(comment) {
+			// Empty comment.
+			pass.Reportf(
+				elementPos,
+				commentEmptyTmpl,
+				elementName,
+			)
+		}
+
+		return
+	}
+
+	words := strings.Fields(strings.TrimSpace(text))
 
 	// Set to empty if there's no non-whitespace characters in the comment.
 	firstWord := ""
@@ -84,7 +132,15 @@ func checkExported(
 	elementExported bool,
 	recvExported bool,
 ) {
-	if comment != nil || !elementExported {
+	commented := false
+	// We only want to report missing comments if we haven't already reported the
+	// comment is empty.
+	if comment != nil {
+		commented = len(comment.Text()) > 0 ||
+			!containsOnlyMachineReadableComment(comment)
+	}
+
+	if commented || !elementExported {
 		return
 	}
 
@@ -96,8 +152,6 @@ func checkExported(
 			commentMissingTmpl,
 			elementName,
 		)
-
-		return
 	}
 }
 

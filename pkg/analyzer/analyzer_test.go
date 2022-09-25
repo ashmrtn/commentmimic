@@ -598,6 +598,57 @@ func (s *CommentMimicSuite) TestHandlesExtraWhitespace() {
 	analysistest.Run(t, dir, mimic, "a")
 }
 
+func (s *CommentMimicSuite) TestMachineCommentsMismatch() {
+	t := s.T()
+	flags := map[string]bool{
+		"comment-exported":     true,
+		"comment-all-exported": true,
+		"comment-interfaces":   true,
+	}
+
+	fileMap := map[string]string{
+		"a/a.go": testdata.EmptyComments,
+	}
+
+	dir, cleanup, err := analysistest.WriteFiles(fileMap)
+	require.NoError(t, err)
+
+	defer cleanup()
+
+	mimic := analyzer.NewCommentMimic()
+
+	for flag, value := range flags {
+		require.NoError(t, mimic.Flags.Set(flag, strconv.FormatBool(value)))
+	}
+
+	analysistest.Run(t, dir, mimic, "a")
+}
+
+func (s *CommentMimicSuite) TestMachineCommentsOnExported() {
+	t := s.T()
+	flags := map[string]bool{
+		"comment-all-exported": true,
+		"comment-interfaces":   true,
+	}
+
+	fileMap := map[string]string{
+		"a/a.go": testdata.MachineReadableExported,
+	}
+
+	dir, cleanup, err := analysistest.WriteFiles(fileMap)
+	require.NoError(t, err)
+
+	defer cleanup()
+
+	mimic := analyzer.NewCommentMimic()
+
+	for flag, value := range flags {
+		require.NoError(t, mimic.Flags.Set(flag, strconv.FormatBool(value)))
+	}
+
+	analysistest.Run(t, dir, mimic, "a")
+}
+
 func (s *CommentMimicSuite) TestFuncCommentErrors() {
 	element := "element"
 	base := generateCommentMimicCases(element)
