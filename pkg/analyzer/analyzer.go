@@ -16,7 +16,16 @@ const (
 	commentMismatchTmpl = "first word of comment is '%s' instead of '%s'"
 	commentEmptyTmpl    = "empty comment on '%s'"
 	commentMissingTmpl  = "exported element '%s' should be commented"
+
+	testFileNameSuffix = "_test.go"
 )
+
+var testCommentPrefix = []string{
+	"Benchmark",
+	"Example",
+	"Fuzz",
+	"Test",
+}
 
 func checkComment(
 	pass *analysis.Pass,
@@ -155,6 +164,21 @@ func checkExported(
 	}
 }
 
+func isTestFunc(fset *token.FileSet, pos token.Pos, elementName string) bool {
+	fName := fset.Position(pos).Filename
+	if !strings.HasSuffix(fName, testFileNameSuffix) {
+		return false
+	}
+
+	for _, name := range testCommentPrefix {
+		if strings.HasPrefix(elementName, name) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (m mimic) checkFuncDecl(pass *analysis.Pass, fun *ast.FuncDecl) {
 	// Default to true so free functions will be marked as needing a comment if
 	// commentExported is set.
@@ -180,10 +204,18 @@ func (m mimic) checkFuncDecl(pass *analysis.Pass, fun *ast.FuncDecl) {
 		}
 	}
 
+	commentExported := m.commentExportedFuncs
+	commentAllExported := m.commentAllExportedFuncs
+
+	if isTestFunc(pass.Fset, fun.Pos(), fun.Name.Name) {
+		commentExported = false
+		commentAllExported = false
+	}
+
 	checkComment(
 		pass,
-		m.commentExportedFuncs,
-		m.commentAllExportedFuncs,
+		commentExported,
+		commentAllExported,
 		fun.Name.Name,
 		fun.Pos(),
 		fun.Doc,
@@ -282,6 +314,7 @@ type mimic struct {
 	commentExportedFuncs    bool
 	commentAllExportedFuncs bool
 	commentInterfaces       bool
+	noTestComments          bool
 }
 
 func NewCommentMimic() *analysis.Analyzer {
@@ -307,6 +340,13 @@ func NewCommentMimic() *analysis.Analyzer {
 		"comment-interfaces",
 		false,
 		"require comments on all exported interfaces",
+	)
+
+	fs.BoolVar(
+		&m.noTestComments,
+		"no-test-comments",
+		true,
+		"don't require comments on tests, benchmarks, examples, and fuzz tests",
 	)
 
 	return &analysis.Analyzer{
