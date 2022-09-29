@@ -208,4 +208,31 @@ type testIface interface {
   UnexportedInterfaceFunc() bool // want "exported element 'UnexportedInterfaceFunc' should be commented"
 }
 `
+
+	SkipTestComments = `package a_test
+
+  import (
+    "testing"
+  )
+
+  type BenchmarkInterface interface {} // want "exported element 'BenchmarkInterface' should be commented"
+
+  type ExampleInterface interface {} // want "exported element 'ExampleInterface' should be commented"
+
+  type FuzzInterface interface {} // want "exported element 'FuzzInterface' should be commented"
+
+  type TestInterface interface {} // want "exported element 'TestInterface' should be commented"
+
+  func BenchmarkDoesntNeedComment(b *testing.B) {}
+
+  func ExportedElement() bool { // want "exported element 'ExportedElement' should be commented"
+    return false
+  }
+
+  func ExampleDoesntNeedComment() {}
+
+  func FuzzDoesntNeedComment(f *testing.F) {}
+
+  func TestDoesntNeedComment(t *testing.T) {}
+`
 )

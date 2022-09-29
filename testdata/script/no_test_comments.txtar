@@ -1,0 +1,38 @@
+! exec commentmimic --comment-all-exported --no-test-comments not_commented_errors.go not_commented_errors_test.go
+stderr -count=4 'exported element ''Func[A-D]'' should be commented'
+
+-- not_commented_errors.go --
+package notcommentederrors
+
+type testStruct struct {}
+
+func (t testStruct) FuncA() bool {
+  return false
+}
+
+func (t *testStruct) FuncB() bool {
+  return false
+}
+
+func FuncC() bool {
+  return false
+}
+
+-- not_commented_errors_test.go --
+package notcommentederrors
+
+import (
+    "testing"
+)
+
+func BenchmarkSomeFunc(b *testing.B) {}
+
+func ExampleSomeFunc() {}
+
+func FuzzSomeFunc(f *testing.F) {}
+
+func TestSomeFunc(t *testing.T) {}
+
+func FuncD() bool {
+  return false
+}

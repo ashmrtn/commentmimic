@@ -649,6 +649,33 @@ func (s *CommentMimicSuite) TestMachineCommentsOnExported() {
 	analysistest.Run(t, dir, mimic, "a")
 }
 
+func (s *CommentMimicSuite) TestSkipTestComments() {
+	t := s.T()
+	flags := map[string]bool{
+		"comment-exported":     true,
+		"comment-all-exported": true,
+		"comment-interfaces":   true,
+		"no-test-comments":     true,
+	}
+
+	fileMap := map[string]string{
+		"a/a_test.go": testdata.SkipTestComments,
+	}
+
+	dir, cleanup, err := analysistest.WriteFiles(fileMap)
+	require.NoError(t, err)
+
+	defer cleanup()
+
+	mimic := analyzer.NewCommentMimic()
+
+	for flag, value := range flags {
+		require.NoError(t, mimic.Flags.Set(flag, strconv.FormatBool(value)))
+	}
+
+	analysistest.Run(t, dir, mimic, "./...")
+}
+
 func (s *CommentMimicSuite) TestFuncCommentErrors() {
 	element := "element"
 	base := generateCommentMimicCases(element)
