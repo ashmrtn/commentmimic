@@ -1,12 +1,12 @@
 module github.com/ashmrtn/commentmimic
 
-go 1.18
+go 1.19
 
 require (
 	github.com/rogpeppe/go-internal v1.9.0
 	github.com/stretchr/testify v1.8.0
-	golang.org/x/sys v0.0.0-20220909162455-aba9fc2a8ff2
-	golang.org/x/tools v0.1.12
+	golang.org/x/sys v0.7.0
+	golang.org/x/tools v0.8.0
 	gotest.tools/gotestsum v1.8.2
 )
 
@@ -20,8 +20,8 @@ require (
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/pkg/diff v0.0.0-20210226163009-20ebb0f2a09e // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
-	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
+	golang.org/x/mod v0.10.0 // indirect
+	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/term v0.0.0-20220526004731-065cf7ba2467 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
