@@ -1,6 +1,7 @@
 package testdata
 
-const FileGenTmpls = `{{define "ReceiverFunction"}}type {{ .Receiver }} struct{
+const FileGenTmpls = `{{define "ReceiverFunction"}}// {{ .Receiver }}
+type {{ .Receiver }} struct{
 }
 
 {{template "maybeCommentWithError" .}}
@@ -8,7 +9,8 @@ func (r {{ .Receiver -}}) {{template "freeFuncDef" .}} { {{template "maybeElemen
   return false
 }{{end}}
 
-{{define "ReceiverPtrFunction"}}type {{ .Receiver }} struct{
+{{define "ReceiverPtrFunction"}}// {{ .Receiver }}
+type {{ .Receiver }} struct{
 }
 
 {{template "maybeCommentWithError" .}}
@@ -20,6 +22,23 @@ func (r *{{- .Receiver -}}) {{template "freeFuncDef" .}} { {{template "maybeElem
 func {{template "freeFuncDef" .}} { {{template "maybeElementError" .}}
   return false
 }{{end}}
+
+{{define "Struct"}}{{template "maybeCommentWithError" .}}
+type {{ .Element }} struct {} {{template "maybeElementError" .}}{{end}}
+
+{{define "BlockStruct"}}{{template "maybeCommentWithError" }}
+type (
+{{if .Confusing}}
+  testConfusingStruct1 struct {}
+{{end}}
+
+  {{template "maybeCommentWithError" .}}
+  {{ .Element }} struct {} {{template "maybeElementError" .}}
+
+{{if .Confusing}}
+  testConfusingStruct2 struct {}
+{{end}}
+){{end}}
 
 {{define "Interface"}}{{template "maybeCommentWithError" .}}
 type {{template "interfaceInner" .}}{{end}}
@@ -47,14 +66,14 @@ type (
 {{if .InterfaceFunc.Confusing}}  testConfusingInterfaceFunc2() bool{{end}}{{end}}
 }{{end}}
 
-{{define "regularComment"}}// {{ .Text }} has a comment.{{if .Multiline}}
+{{define "regularComment"}}// {{if .Text0}}{{ .Text0 }} {{end}}{{ .Text }} has a comment.{{if .Multiline}}
 // This is another line of comment text.{{end}}{{end}}
 
-{{define "blockCommentInline"}}/* {{ .Text }} has a comment.{{if .Multiline}}
+{{define "blockCommentInline"}}/* {{if .Text0}}{{ .Text0 }} {{end}}{{ .Text }} has a comment.{{if .Multiline}}
 This is another line of comment text.{{end}} */{{end}}
 
 {{define "blockCommentMultiline"}}/*
-{{ .Text }} has a comment.{{if .Multiline}}
+{{if .Text0}}{{ .Text0 }} {{end}}{{ .Text }} has a comment.{{if .Multiline}}
 This is another line of comment text.{{end}}
 */{{end}}
 
@@ -62,18 +81,18 @@ This is another line of comment text.{{end}}
 
 {{define "maybeComment"}}{{if .Text}}{{if eq .Type.String "InlineComment"}}{{template "regularComment" .}}{{else if eq .Type.String "BlockInlineComment"}}{{template "blockCommentInline" .}}{{else}}{{template "blockCommentMultiline" .}}{{end}}{{end}}{{end}}
 
-{{define "regularCommentWithError"}}// {{ .FirstWord.Text }} has a comment.{{if .CommentError}} {{template "commentMismatch" .}}{{end}}{{if .FirstWord.Multiline}}
+{{define "regularCommentWithError"}}// {{if .FirstWord.Text0}}{{ .FirstWord.Text0 }} {{end}}{{ .FirstWord.Text }} has a comment.{{if .CommentError}} {{template "commentMismatch" .}}{{end}}{{if .FirstWord.Multiline}}
 // This is another line of comment text.{{end}}{{end}}
 
-{{define "blockCommentInlineWithError"}}/*{{ .FirstWord.Text}} has a comment.{{if .FirstWord.Multiline}}
+{{define "blockCommentInlineWithError"}}/*{{if .FirstWord.Text0}}{{ .FirstWord.Text0 }} {{end}}{{ .FirstWord.Text}} has a comment.{{if .FirstWord.Multiline}}
 This is another line of comment text.{{end}}{{if .CommentError}} {{template "commentMismatch" .}}{{end}} */{{end}}
 
 {{define "blockCommentMultilineWithError"}}/*
-{{ .FirstWord.Text }} has a comment.{{if .FirstWord.Multiline}}
+{{if .FirstWord.Text0}}{{ .FirstWord.Text0 }} {{end}}{{ .FirstWord.Text }} has a comment.{{if .FirstWord.Multiline}}
 This is another line of comment text.{{end}}{{if .CommentError}} {{template "commentMismatch" .}}{{end}}
 */{{end}}
 
-{{define "commentMismatch"}}// want "first word of comment is '{{- .FirstWord.Text -}}' instead of '{{- .Element -}}'" {{end}}
+{{define "commentMismatch"}}// want "first word of comment is '{{if .FirstWord.Text0 }}{{- .FirstWord.Text0 -}}{{else}}{{- .FirstWord.Text -}}{{end}}' instead of '{{- .Element -}}'" {{end}}
 
 {{define "commentMissing"}}// want "exported element '{{- .Element -}}' should be commented"{{end}}
 

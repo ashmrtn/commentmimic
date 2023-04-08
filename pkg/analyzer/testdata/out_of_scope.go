@@ -52,44 +52,6 @@ const (
 )
 
 /*
-struct declarations -- should be ignored in all cases.
-*/
-
-// structUnexportedCorrectComment has a correctly formatted comment.
-type structUnexportedCorrectComment struct{
-}
-
-// This structUnexportedWrongComment has an incorrectly formatted comment.
-type structUnexportedWrongComment struct {
-}
-
-// StructExportedCorrectComment has a correctly formatted comment.
-type StructExportedCorrectComment struct{
-}
-
-// This StructExportedWrongComment has an incorrectly formatted comment.
-type StructExportedWrongComment struct {
-}
-
-type (
-  // structUnexportedCorrectComment has a correctly formatted comment.
-  blockStructUnexportedCorrectComment struct{
-  }
-
-  // This structUnexportedWrongComment has an incorrectly formatted comment.
-  blockStructUnexportedWrongComment struct {
-  }
-
-  // StructExportedCorrectComment has a correctly formatted comment.
-  BlockStructExportedCorrectComment struct{
-  }
-
-  // This StructExportedWrongComment has an incorrectly formatted comment.
-  BlockStructExportedWrongComment struct {
-  }
-)
-
-/*
 Type equivalences -- should be ignored in all cases.
 */
 
