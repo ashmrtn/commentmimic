@@ -34,47 +34,105 @@ var (
 			"comment-exported":     false,
 			"comment-all-exported": false,
 			"comment-interfaces":   false,
+			"comment-structs":      false,
+		},
+		{
+			"comment-exported":     false,
+			"comment-all-exported": false,
+			"comment-interfaces":   false,
+			"comment-structs":      true,
 		},
 		{
 			"comment-exported":     false,
 			"comment-all-exported": false,
 			"comment-interfaces":   true,
+			"comment-structs":      false,
+		},
+		{
+			"comment-exported":     false,
+			"comment-all-exported": false,
+			"comment-interfaces":   true,
+			"comment-structs":      true,
 		},
 		{
 			"comment-exported":     false,
 			"comment-all-exported": true,
 			"comment-interfaces":   false,
+			"comment-structs":      false,
+		},
+		{
+			"comment-exported":     false,
+			"comment-all-exported": true,
+			"comment-interfaces":   false,
+			"comment-structs":      true,
 		},
 		{
 			"comment-exported":     false,
 			"comment-all-exported": true,
 			"comment-interfaces":   true,
+			"comment-structs":      false,
+		},
+		{
+			"comment-exported":     false,
+			"comment-all-exported": true,
+			"comment-interfaces":   true,
+			"comment-structs":      true,
 		},
 		{
 			"comment-exported":     true,
 			"comment-all-exported": false,
 			"comment-interfaces":   false,
+			"comment-structs":      false,
+		},
+		{
+			"comment-exported":     true,
+			"comment-all-exported": false,
+			"comment-interfaces":   false,
+			"comment-structs":      true,
 		},
 		{
 			"comment-exported":     true,
 			"comment-all-exported": false,
 			"comment-interfaces":   true,
+			"comment-structs":      false,
+		},
+		{
+			"comment-exported":     true,
+			"comment-all-exported": false,
+			"comment-interfaces":   true,
+			"comment-structs":      true,
 		},
 		{
 			"comment-exported":     true,
 			"comment-all-exported": true,
 			"comment-interfaces":   false,
+			"comment-structs":      false,
+		},
+		{
+			"comment-exported":     true,
+			"comment-all-exported": true,
+			"comment-interfaces":   false,
+			"comment-structs":      true,
 		},
 		{
 			"comment-exported":     true,
 			"comment-all-exported": true,
 			"comment-interfaces":   true,
+			"comment-structs":      false,
+		},
+		{
+			"comment-exported":     true,
+			"comment-all-exported": true,
+			"comment-interfaces":   true,
+			"comment-structs":      true,
 		},
 	}
 )
 
 type commentData struct {
-	Type      testdata.CommentType
+	Type testdata.CommentType
+	// Text0 is a lead word that is placed before Text in the generated comment.
+	Text0     string
 	Text      string
 	Multiline bool
 }
@@ -474,6 +532,42 @@ func genEmptyInterfaceCases(
 	return res
 }
 
+func genStructCases(
+	tests []templateData,
+	structExported bool,
+) map[string][]templateData {
+	res := map[string][]templateData{}
+	templates := map[string]templateData{
+		"-Struct": {
+			template: "Struct",
+		},
+		"OneBlock-Struct": {
+			template: "BlockStruct",
+		},
+		"ManyBlock-Struct": {
+			template:  "BlockStruct",
+			Confusing: true,
+		},
+	}
+
+	for t, tmpl := range templates {
+		for _, testCase := range tests {
+			fullName := t
+			if structExported {
+				fullName = strings.ReplaceAll(fullName, "-", "Exported")
+			} else {
+				fullName = strings.ReplaceAll(fullName, "-", "Unexported")
+			}
+
+			testCase.template = tmpl.template
+			testCase.Confusing = tmpl.Confusing
+			res[fullName] = append(res[fullName], testCase)
+		}
+	}
+
+	return res
+}
+
 func genTestFiles(
 	t *testing.T,
 	tmpl *template.Template,
@@ -604,6 +698,7 @@ func (s *CommentMimicSuite) TestMachineCommentsMismatch() {
 		"comment-exported":     true,
 		"comment-all-exported": true,
 		"comment-interfaces":   true,
+		"comment-structs":      true,
 	}
 
 	fileMap := map[string]string{
@@ -629,6 +724,7 @@ func (s *CommentMimicSuite) TestMachineCommentsOnExported() {
 	flags := map[string]bool{
 		"comment-all-exported": true,
 		"comment-interfaces":   true,
+		"comment-structs":      true,
 	}
 
 	fileMap := map[string]string{
@@ -655,6 +751,7 @@ func (s *CommentMimicSuite) TestSkipTestComments() {
 		"comment-exported":     true,
 		"comment-all-exported": true,
 		"comment-interfaces":   true,
+		"comment-structs":      true,
 		"no-test-comments":     true,
 	}
 
@@ -876,6 +973,73 @@ func (s *CommentMimicSuite) TestInterfaceFuncCommentErrors() {
 	}
 }
 
+func (s *CommentMimicSuite) TestStructCommentErrors() {
+	element := "element"
+	table := generateCommentMimicCases(element)
+	patterns := []struct {
+		name      string
+		template  string
+		confusing bool
+	}{
+		{
+			name:     "Struct",
+			template: "Struct",
+		},
+		{
+			name:     "BlockOneStruct",
+			template: "BlockStruct",
+		},
+		{
+			name:      "BlockSeveralStructs",
+			template:  "BlockStruct",
+			confusing: true,
+		},
+	}
+
+	leads := append([]string{""}, structLeadWords...)
+
+	for _, pattern := range patterns {
+		pattern := pattern
+
+		s.T().Run(pattern.name, func(t2 *testing.T) {
+			t2.Parallel()
+
+			for _, lead := range leads {
+				lead := lead
+				prefix := "NoLead"
+
+				if len(lead) > 0 {
+					prefix = fmt.Sprintf("Lead_%s_", lead)
+				}
+
+				t2.Run(prefix, func(t1 *testing.T) {
+					t1.Parallel()
+
+					for _, test := range table {
+						test := test
+
+						t1.Run(test.name, func(t *testing.T) {
+							t.Parallel()
+
+							test.template = pattern.template
+							test.Confusing = pattern.confusing
+							test.FirstWord.Text0 = lead
+							test.InterfaceBlockFirstWord.Text0 = lead
+
+							executeCommentMimicWithAllFlagCombos(
+								t,
+								fileTmpl,
+								test.template,
+								test,
+							)
+						})
+					}
+				})
+			}
+		})
+	}
+}
+
 func (s *CommentMimicSuite) TestCommentAccessibleExportedFuncs() {
 	const (
 		element  = "element"
@@ -890,6 +1054,7 @@ func (s *CommentMimicSuite) TestCommentAccessibleExportedFuncs() {
 			// Turn off as this will be testing some exported interfaces that we don't
 			// want to comment.
 			"comment-interfaces": false,
+			"comment-structs":    false,
 		}
 
 		funcCases = []templateData{
@@ -1009,6 +1174,7 @@ func (s *CommentMimicSuite) TestCommentAllExportedFuncs() {
 				// Turn off as this will be testing some exported interfaces that we
 				// don't want to comment.
 				"comment-interfaces": false,
+				"comment-structs":    false,
 			},
 			{
 				"comment-exported":     true,
@@ -1016,6 +1182,7 @@ func (s *CommentMimicSuite) TestCommentAllExportedFuncs() {
 				// Turn off as this will be testing some exported interfaces that we
 				// don't want to comment.
 				"comment-interfaces": false,
+				"comment-structs":    false,
 			},
 		}
 
@@ -1140,6 +1307,7 @@ func (s *CommentMimicSuite) TestCommentExportedEmptyInterfaces() {
 			"comment-exported":     false,
 			"comment-all-exported": false,
 			"comment-interfaces":   true,
+			"comment-structs":      false,
 		}
 
 		ifaceCases = []templateData{
@@ -1204,6 +1372,160 @@ func (s *CommentMimicSuite) TestCommentExportedEmptyInterfaces() {
 			InterfaceBlockFirstWord: commentData{
 				Type: testdata.InlineComment,
 				Text: capWord(iface),
+			},
+		},
+	)
+
+	for name, caseList := range cases {
+		name := name
+		caseList := caseList
+
+		s.T().Run(name, func(t1 *testing.T) {
+			t1.Parallel()
+
+			for _, test := range caseList {
+				test := test
+
+				t1.Run(test.name, func(t *testing.T) {
+					t.Parallel()
+					executeCommentMimic(
+						t,
+						fileTmpl,
+						test.template,
+						test,
+						flags,
+					)
+				})
+			}
+		})
+	}
+}
+
+var structLeadWords = []string{
+	"A",
+	"An",
+}
+
+func (s *CommentMimicSuite) TestCommentExportedStructs() {
+	const strct = "strct"
+
+	var (
+		flags = map[string]bool{
+			"comment-exported":     false,
+			"comment-all-exported": false,
+			"comment-interfaces":   false,
+			"comment-structs":      true,
+		}
+
+		baseStructCases = []templateData{
+			{
+				name: "NoError",
+				FirstWord: commentData{
+					Type: testdata.InlineComment,
+					Text: capWord(strct),
+				},
+				Element: capWord(strct),
+			},
+			{
+				name: "MimicError",
+				FirstWord: commentData{
+					Type: testdata.InlineComment,
+					Text: "foo",
+				},
+				CommentError: true,
+				Element:      capWord(strct),
+			},
+			{
+				name:         "Error",
+				Element:      capWord(strct),
+				ElementError: true,
+			},
+		}
+	)
+
+	allLeads := append([]string{""}, structLeadWords...)
+	structCases := make(
+		[]templateData,
+		0,
+		len(allLeads)*len(baseStructCases)+2,
+	)
+
+	for _, lead := range allLeads {
+		prefix := "NoLead"
+
+		if len(lead) > 0 {
+			prefix = fmt.Sprintf("Lead_%s_", lead)
+		}
+
+		for _, c := range baseStructCases {
+			c.name += prefix
+			c.FirstWord.Text0 = lead
+
+			structCases = append(structCases, c)
+		}
+	}
+
+	// Add cases with a bad lead that fail.
+	structCases = append(
+		structCases,
+		templateData{
+			name: "MimicErrorLead_foo_GoodElement",
+			FirstWord: commentData{
+				Type:  testdata.InlineComment,
+				Text0: "foo",
+				Text:  capWord(strct),
+			},
+			CommentError: true,
+			Element:      capWord(strct),
+		},
+		templateData{
+			name: "MimicErrorLead_foo_BadElement",
+			FirstWord: commentData{
+				Type:  testdata.InlineComment,
+				Text0: "foo",
+				Text:  "foo",
+			},
+			CommentError: true,
+			Element:      capWord(strct),
+		},
+	)
+
+	cases := genStructCases(structCases, exported)
+	cases["UnexportedStruct"] = append(
+		cases["UnexportedStruct"],
+		templateData{
+			name:     "NoError",
+			template: "Struct",
+			Element:  lowerWord(strct),
+		},
+	)
+	cases["OneBlockUnexportedStruct"] = append(
+		cases["OneBlockUnexportedStruct"],
+		templateData{
+			name:     "NoError",
+			template: "BlockStruct",
+			Element:  lowerWord(strct),
+		},
+	)
+	cases["ManyBlockUnexportedStruct"] = append(
+		cases["ManyBlockUnexportedStruct"],
+		templateData{
+			name:      "NoError",
+			template:  "BlockStruct",
+			Element:   lowerWord(strct),
+			Confusing: true,
+		},
+	)
+	cases["OneBlockExportedStruct"] = append(
+		cases["OneBlockExportedStruct"],
+		templateData{
+			name:         "ErrorCommentedBlock",
+			template:     "BlockStruct",
+			Element:      capWord(strct),
+			ElementError: true,
+			InterfaceBlockFirstWord: commentData{
+				Type: testdata.InlineComment,
+				Text: capWord(strct),
 			},
 		},
 	)

@@ -12,7 +12,6 @@ import (
 )
 
 const (
-	//nolint:lll
 	commentMismatchTmpl = "first word of comment is '%s' instead of '%s'"
 	commentEmptyTmpl    = "empty comment on '%s'"
 	commentMissingTmpl  = "exported element '%s' should be commented"
@@ -20,12 +19,20 @@ const (
 	testFileNameSuffix = "_test.go"
 )
 
-var testCommentPrefix = []string{
-	"Benchmark",
-	"Example",
-	"Fuzz",
-	"Test",
-}
+var (
+	testCommentPrefix = []string{
+		"Benchmark",
+		"Example",
+		"Fuzz",
+		"Test",
+	}
+
+	// This will enforce capitalization of the first word as well.
+	structLeadWords = map[string]struct{}{
+		"A":  {},
+		"An": {},
+	}
+)
 
 func checkComment(
 	pass *analysis.Pass,
@@ -36,12 +43,14 @@ func checkComment(
 	comment *ast.CommentGroup,
 	elementExported bool,
 	recvExported bool,
+	leadWords map[string]struct{},
 ) {
 	checkCommentMismatch(
 		pass,
 		elementName,
 		comment,
 		elementPos,
+		leadWords,
 	)
 	checkExported(
 		pass,
@@ -83,11 +92,21 @@ func containsOnlyMachineReadableComment(comment *ast.CommentGroup) bool {
 	return onlyMachine
 }
 
+// checkCommentMismatch checks if the element with the given name has a first or
+// second word that matches the element name. If it doesn't it reports the
+// result to pass.
+//
+// Comments that are only machine readable comments are ignored.
+//
+// leadWords denotes the set of leading words that are allowed. If leadWords is
+// non-nil and non-empty this function will check if the second word matches the
+// element name if the first word doesn't match.
 func checkCommentMismatch(
 	pass *analysis.Pass,
 	elementName string,
 	comment *ast.CommentGroup,
 	elementPos token.Pos,
+	leadWords map[string]struct{},
 ) {
 	if comment == nil {
 		return
@@ -121,6 +140,16 @@ func checkCommentMismatch(
 
 	if firstWord == elementName {
 		return
+	}
+
+	// See if this comment has a first word that matches a lead word and then
+	// check if the second word matches the element name.
+	if len(words) > 1 {
+		secondWord := words[1]
+
+		if _, ok := leadWords[firstWord]; ok && secondWord == elementName {
+			return
+		}
 	}
 
 	pass.Reportf(
@@ -221,6 +250,7 @@ func (m mimic) checkFuncDecl(pass *analysis.Pass, fun *ast.FuncDecl) {
 		fun.Doc,
 		fun.Name.IsExported(),
 		exportedRecv,
+		nil,
 	)
 }
 
@@ -231,12 +261,24 @@ func (m mimic) checkGenDecl(pass *analysis.Pass, decl *ast.GenDecl) {
 			continue
 		}
 
-		exportedRecv := ts.Name.IsExported()
+		var (
+			commentFlag bool
+			leadWords   map[string]struct{}
+		)
 
-		iface, ok := ts.Type.(*ast.InterfaceType)
-		if !ok {
+		switch ts.Type.(type) {
+		case *ast.StructType:
+			commentFlag = m.commentStructs
+			leadWords = structLeadWords
+
+		case *ast.InterfaceType:
+			commentFlag = m.commentInterfaces
+
+		default:
 			continue
 		}
+
+		exportedRecv := ts.Name.IsExported()
 
 		// If the type-declaration a single declaration (i.e. not grouped by
 		// parentheses), then the doc comment is attached to the GenDecl node. If
@@ -250,18 +292,26 @@ func (m mimic) checkGenDecl(pass *analysis.Pass, decl *ast.GenDecl) {
 			pos = ts.Pos()
 		}
 
-		// Check if interface is commented properly.
+		// Check if struct or interface is commented properly.
 		checkComment(
 			pass,
 			// Set to false so the flag completely controls output behavior.
 			false,
-			m.commentInterfaces,
+			commentFlag,
 			ts.Name.Name,
 			pos,
 			doc,
 			exportedRecv,
 			true,
+			leadWords,
 		)
+
+		iface, ok := ts.Type.(*ast.InterfaceType)
+		if !ok {
+			// Structs can't embed other type definitions or function names so it's
+			// safe to return after just checking the comment.
+			continue
+		}
 
 		for _, field := range iface.Methods.List {
 			_, ok := field.Type.(*ast.FuncType)
@@ -278,6 +328,7 @@ func (m mimic) checkGenDecl(pass *analysis.Pass, decl *ast.GenDecl) {
 				field.Doc,
 				field.Names[0].IsExported(),
 				exportedRecv,
+				nil,
 			)
 		}
 	}
@@ -314,6 +365,7 @@ type mimic struct {
 	commentExportedFuncs    bool
 	commentAllExportedFuncs bool
 	commentInterfaces       bool
+	commentStructs          bool
 	noTestComments          bool
 }
 
@@ -347,6 +399,13 @@ func NewCommentMimic() *analysis.Analyzer {
 		"no-test-comments",
 		true,
 		"don't require comments on tests, benchmarks, examples, and fuzz tests",
+	)
+
+	fs.BoolVar(
+		&m.commentStructs,
+		"comment-structs",
+		false,
+		"require comments on all exported structs",
 	)
 
 	return &analysis.Analyzer{
