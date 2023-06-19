@@ -1,4 +1,4 @@
-package analyzer_test
+package commentmimic_test
 
 import (
 	"bytes"
@@ -13,8 +13,8 @@ import (
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/tools/go/analysis/analysistest"
 
-	"github.com/ashmrtn/commentmimic/pkg/analyzer"
-	"github.com/ashmrtn/commentmimic/pkg/analyzer/testdata"
+	"github.com/ashmrtn/commentmimic/pkg/commentmimic"
+	"github.com/ashmrtn/commentmimic/pkg/commentmimic/testdata"
 )
 
 const (
