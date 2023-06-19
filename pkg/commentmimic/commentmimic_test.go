@@ -597,7 +597,7 @@ func executeMimicWithFlagsOnFiles(
 ) {
 	t.Helper()
 
-	mimic := analyzer.NewCommentMimic()
+	mimic := commentmimic.New()
 
 	for flag, value := range flags {
 		require.NoError(t, mimic.Flags.Set(flag, strconv.FormatBool(value)))
@@ -665,7 +665,7 @@ func (s *CommentMimicSuite) TestDoesNotErrorOnOutOfScope() {
 
 			defer cleanup()
 
-			mimic := analyzer.NewCommentMimic()
+			mimic := commentmimic.New()
 
 			for flag, value := range flags {
 				require.NoError(s.T(), mimic.Flags.Set(flag, strconv.FormatBool(value)))
@@ -688,7 +688,7 @@ func (s *CommentMimicSuite) TestHandlesExtraWhitespace() {
 
 	defer cleanup()
 
-	mimic := analyzer.NewCommentMimic()
+	mimic := commentmimic.New()
 	analysistest.Run(t, dir, mimic, "a")
 }
 
@@ -710,7 +710,7 @@ func (s *CommentMimicSuite) TestMachineCommentsMismatch() {
 
 	defer cleanup()
 
-	mimic := analyzer.NewCommentMimic()
+	mimic := commentmimic.New()
 
 	for flag, value := range flags {
 		require.NoError(t, mimic.Flags.Set(flag, strconv.FormatBool(value)))
@@ -736,7 +736,7 @@ func (s *CommentMimicSuite) TestMachineCommentsOnExported() {
 
 	defer cleanup()
 
-	mimic := analyzer.NewCommentMimic()
+	mimic := commentmimic.New()
 
 	for flag, value := range flags {
 		require.NoError(t, mimic.Flags.Set(flag, strconv.FormatBool(value)))
@@ -764,7 +764,7 @@ func (s *CommentMimicSuite) TestSkipTestComments() {
 
 	defer cleanup()
 
-	mimic := analyzer.NewCommentMimic()
+	mimic := commentmimic.New()
 
 	for flag, value := range flags {
 		require.NoError(t, mimic.Flags.Set(flag, strconv.FormatBool(value)))

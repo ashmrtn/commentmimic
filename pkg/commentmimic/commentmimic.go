@@ -369,7 +369,7 @@ type mimic struct {
 	noTestComments          bool
 }
 
-func NewCommentMimic() *analysis.Analyzer {
+func New() *analysis.Analyzer {
 	m := mimic{}
 
 	fs := flag.NewFlagSet("CommentMimicFlags", flag.ExitOnError)

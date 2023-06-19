@@ -7,6 +7,6 @@ import (
 )
 
 func main() {
-	a := analyzer.NewCommentMimic()
+	a := commentmimic.New()
 	singlechecker.Main(a)
 }
