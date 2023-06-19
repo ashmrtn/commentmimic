@@ -31,100 +31,100 @@ var (
 	)
 	flagProduct = []map[string]bool{
 		{
-			"comment-exported":     false,
-			"comment-all-exported": false,
-			"comment-interfaces":   false,
-			"comment-structs":      false,
+			commentmimic.CommentExportedFuncsFlag:    false,
+			commentmimic.CommentAllExportedFuncsFlag: false,
+			commentmimic.CommentInterfacesFlag:       false,
+			commentmimic.CommentStructsFlag:          false,
 		},
 		{
-			"comment-exported":     false,
-			"comment-all-exported": false,
-			"comment-interfaces":   false,
-			"comment-structs":      true,
+			commentmimic.CommentExportedFuncsFlag:    false,
+			commentmimic.CommentAllExportedFuncsFlag: false,
+			commentmimic.CommentInterfacesFlag:       false,
+			commentmimic.CommentStructsFlag:          true,
 		},
 		{
-			"comment-exported":     false,
-			"comment-all-exported": false,
-			"comment-interfaces":   true,
-			"comment-structs":      false,
+			commentmimic.CommentExportedFuncsFlag:    false,
+			commentmimic.CommentAllExportedFuncsFlag: false,
+			commentmimic.CommentInterfacesFlag:       true,
+			commentmimic.CommentStructsFlag:          false,
 		},
 		{
-			"comment-exported":     false,
-			"comment-all-exported": false,
-			"comment-interfaces":   true,
-			"comment-structs":      true,
+			commentmimic.CommentExportedFuncsFlag:    false,
+			commentmimic.CommentAllExportedFuncsFlag: false,
+			commentmimic.CommentInterfacesFlag:       true,
+			commentmimic.CommentStructsFlag:          true,
 		},
 		{
-			"comment-exported":     false,
-			"comment-all-exported": true,
-			"comment-interfaces":   false,
-			"comment-structs":      false,
+			commentmimic.CommentExportedFuncsFlag:    false,
+			commentmimic.CommentAllExportedFuncsFlag: true,
+			commentmimic.CommentInterfacesFlag:       false,
+			commentmimic.CommentStructsFlag:          false,
 		},
 		{
-			"comment-exported":     false,
-			"comment-all-exported": true,
-			"comment-interfaces":   false,
-			"comment-structs":      true,
+			commentmimic.CommentExportedFuncsFlag:    false,
+			commentmimic.CommentAllExportedFuncsFlag: true,
+			commentmimic.CommentInterfacesFlag:       false,
+			commentmimic.CommentStructsFlag:          true,
 		},
 		{
-			"comment-exported":     false,
-			"comment-all-exported": true,
-			"comment-interfaces":   true,
-			"comment-structs":      false,
+			commentmimic.CommentExportedFuncsFlag:    false,
+			commentmimic.CommentAllExportedFuncsFlag: true,
+			commentmimic.CommentInterfacesFlag:       true,
+			commentmimic.CommentStructsFlag:          false,
 		},
 		{
-			"comment-exported":     false,
-			"comment-all-exported": true,
-			"comment-interfaces":   true,
-			"comment-structs":      true,
+			commentmimic.CommentExportedFuncsFlag:    false,
+			commentmimic.CommentAllExportedFuncsFlag: true,
+			commentmimic.CommentInterfacesFlag:       true,
+			commentmimic.CommentStructsFlag:          true,
 		},
 		{
-			"comment-exported":     true,
-			"comment-all-exported": false,
-			"comment-interfaces":   false,
-			"comment-structs":      false,
+			commentmimic.CommentExportedFuncsFlag:    true,
+			commentmimic.CommentAllExportedFuncsFlag: false,
+			commentmimic.CommentInterfacesFlag:       false,
+			commentmimic.CommentStructsFlag:          false,
 		},
 		{
-			"comment-exported":     true,
-			"comment-all-exported": false,
-			"comment-interfaces":   false,
-			"comment-structs":      true,
+			commentmimic.CommentExportedFuncsFlag:    true,
+			commentmimic.CommentAllExportedFuncsFlag: false,
+			commentmimic.CommentInterfacesFlag:       false,
+			commentmimic.CommentStructsFlag:          true,
 		},
 		{
-			"comment-exported":     true,
-			"comment-all-exported": false,
-			"comment-interfaces":   true,
-			"comment-structs":      false,
+			commentmimic.CommentExportedFuncsFlag:    true,
+			commentmimic.CommentAllExportedFuncsFlag: false,
+			commentmimic.CommentInterfacesFlag:       true,
+			commentmimic.CommentStructsFlag:          false,
 		},
 		{
-			"comment-exported":     true,
-			"comment-all-exported": false,
-			"comment-interfaces":   true,
-			"comment-structs":      true,
+			commentmimic.CommentExportedFuncsFlag:    true,
+			commentmimic.CommentAllExportedFuncsFlag: false,
+			commentmimic.CommentInterfacesFlag:       true,
+			commentmimic.CommentStructsFlag:          true,
 		},
 		{
-			"comment-exported":     true,
-			"comment-all-exported": true,
-			"comment-interfaces":   false,
-			"comment-structs":      false,
+			commentmimic.CommentExportedFuncsFlag:    true,
+			commentmimic.CommentAllExportedFuncsFlag: true,
+			commentmimic.CommentInterfacesFlag:       false,
+			commentmimic.CommentStructsFlag:          false,
 		},
 		{
-			"comment-exported":     true,
-			"comment-all-exported": true,
-			"comment-interfaces":   false,
-			"comment-structs":      true,
+			commentmimic.CommentExportedFuncsFlag:    true,
+			commentmimic.CommentAllExportedFuncsFlag: true,
+			commentmimic.CommentInterfacesFlag:       false,
+			commentmimic.CommentStructsFlag:          true,
 		},
 		{
-			"comment-exported":     true,
-			"comment-all-exported": true,
-			"comment-interfaces":   true,
-			"comment-structs":      false,
+			commentmimic.CommentExportedFuncsFlag:    true,
+			commentmimic.CommentAllExportedFuncsFlag: true,
+			commentmimic.CommentInterfacesFlag:       true,
+			commentmimic.CommentStructsFlag:          false,
 		},
 		{
-			"comment-exported":     true,
-			"comment-all-exported": true,
-			"comment-interfaces":   true,
-			"comment-structs":      true,
+			commentmimic.CommentExportedFuncsFlag:    true,
+			commentmimic.CommentAllExportedFuncsFlag: true,
+			commentmimic.CommentInterfacesFlag:       true,
+			commentmimic.CommentStructsFlag:          true,
 		},
 	}
 )
@@ -695,10 +695,10 @@ func (s *CommentMimicSuite) TestHandlesExtraWhitespace() {
 func (s *CommentMimicSuite) TestMachineCommentsMismatch() {
 	t := s.T()
 	flags := map[string]bool{
-		"comment-exported":     true,
-		"comment-all-exported": true,
-		"comment-interfaces":   true,
-		"comment-structs":      true,
+		commentmimic.CommentExportedFuncsFlag:    true,
+		commentmimic.CommentAllExportedFuncsFlag: true,
+		commentmimic.CommentInterfacesFlag:       true,
+		commentmimic.CommentStructsFlag:          true,
 	}
 
 	fileMap := map[string]string{
@@ -722,9 +722,9 @@ func (s *CommentMimicSuite) TestMachineCommentsMismatch() {
 func (s *CommentMimicSuite) TestMachineCommentsOnExported() {
 	t := s.T()
 	flags := map[string]bool{
-		"comment-all-exported": true,
-		"comment-interfaces":   true,
-		"comment-structs":      true,
+		commentmimic.CommentAllExportedFuncsFlag: true,
+		commentmimic.CommentInterfacesFlag:       true,
+		commentmimic.CommentStructsFlag:          true,
 	}
 
 	fileMap := map[string]string{
@@ -748,11 +748,11 @@ func (s *CommentMimicSuite) TestMachineCommentsOnExported() {
 func (s *CommentMimicSuite) TestSkipTestComments() {
 	t := s.T()
 	flags := map[string]bool{
-		"comment-exported":     true,
-		"comment-all-exported": true,
-		"comment-interfaces":   true,
-		"comment-structs":      true,
-		"no-test-comments":     true,
+		commentmimic.CommentExportedFuncsFlag:    true,
+		commentmimic.CommentAllExportedFuncsFlag: true,
+		commentmimic.CommentInterfacesFlag:       true,
+		commentmimic.CommentStructsFlag:          true,
+		commentmimic.NoTestCommentsFlag:          true,
 	}
 
 	fileMap := map[string]string{
@@ -1049,12 +1049,12 @@ func (s *CommentMimicSuite) TestCommentAccessibleExportedFuncs() {
 
 	var (
 		flags = map[string]bool{
-			"comment-exported":     true,
-			"comment-all-exported": false,
+			commentmimic.CommentExportedFuncsFlag:    true,
+			commentmimic.CommentAllExportedFuncsFlag: false,
 			// Turn off as this will be testing some exported interfaces that we don't
 			// want to comment.
-			"comment-interfaces": false,
-			"comment-structs":    false,
+			commentmimic.CommentInterfacesFlag: false,
+			commentmimic.CommentStructsFlag:    false,
 		}
 
 		funcCases = []templateData{
@@ -1169,20 +1169,20 @@ func (s *CommentMimicSuite) TestCommentAllExportedFuncs() {
 	var (
 		flagSets = []map[string]bool{
 			{
-				"comment-exported":     false,
-				"comment-all-exported": true,
+				commentmimic.CommentExportedFuncsFlag:    false,
+				commentmimic.CommentAllExportedFuncsFlag: true,
 				// Turn off as this will be testing some exported interfaces that we
 				// don't want to comment.
-				"comment-interfaces": false,
-				"comment-structs":    false,
+				commentmimic.CommentInterfacesFlag: false,
+				commentmimic.CommentStructsFlag:    false,
 			},
 			{
-				"comment-exported":     true,
-				"comment-all-exported": true,
+				commentmimic.CommentExportedFuncsFlag:    true,
+				commentmimic.CommentAllExportedFuncsFlag: true,
 				// Turn off as this will be testing some exported interfaces that we
 				// don't want to comment.
-				"comment-interfaces": false,
-				"comment-structs":    false,
+				commentmimic.CommentInterfacesFlag: false,
+				commentmimic.CommentStructsFlag:    false,
 			},
 		}
 
@@ -1304,10 +1304,10 @@ func (s *CommentMimicSuite) TestCommentExportedEmptyInterfaces() {
 
 	var (
 		flags = map[string]bool{
-			"comment-exported":     false,
-			"comment-all-exported": false,
-			"comment-interfaces":   true,
-			"comment-structs":      false,
+			commentmimic.CommentExportedFuncsFlag:    false,
+			commentmimic.CommentAllExportedFuncsFlag: false,
+			commentmimic.CommentInterfacesFlag:       true,
+			commentmimic.CommentStructsFlag:          false,
 		}
 
 		ifaceCases = []templateData{
@@ -1411,10 +1411,10 @@ func (s *CommentMimicSuite) TestCommentExportedStructs() {
 
 	var (
 		flags = map[string]bool{
-			"comment-exported":     false,
-			"comment-all-exported": false,
-			"comment-interfaces":   false,
-			"comment-structs":      true,
+			commentmimic.CommentExportedFuncsFlag:    false,
+			commentmimic.CommentAllExportedFuncsFlag: false,
+			commentmimic.CommentInterfacesFlag:       false,
+			commentmimic.CommentStructsFlag:          true,
 		}
 
 		baseStructCases = []templateData{
