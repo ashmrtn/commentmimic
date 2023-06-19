@@ -1,4 +1,4 @@
-package analyzer
+package commentmimic
 
 import (
 	"flag"
@@ -361,6 +361,14 @@ func (m mimic) run(pass *analysis.Pass) (any, error) {
 	return nil, nil
 }
 
+const (
+	CommentExportedFuncsFlag    = "comment-exported"
+	CommentAllExportedFuncsFlag = "comment-all-exported"
+	CommentInterfacesFlag       = "comment-interfaces"
+	NoTestCommentsFlag          = "no-test-comments"
+	CommentStructsFlag          = "comment-structs"
+)
+
 type mimic struct {
 	commentExportedFuncs    bool
 	commentAllExportedFuncs bool
@@ -369,41 +377,41 @@ type mimic struct {
 	noTestComments          bool
 }
 
-func NewCommentMimic() *analysis.Analyzer {
+func New() *analysis.Analyzer {
 	m := mimic{}
 
 	fs := flag.NewFlagSet("CommentMimicFlags", flag.ExitOnError)
 	fs.BoolVar(
 		&m.commentExportedFuncs,
-		"comment-exported",
+		CommentExportedFuncsFlag,
 		false,
 		"require comments on exported functions if their receiver is also exported",
 	)
 
 	fs.BoolVar(
 		&m.commentAllExportedFuncs,
-		"comment-all-exported",
+		CommentAllExportedFuncsFlag,
 		false,
 		"require comments on all exported functions",
 	)
 
 	fs.BoolVar(
 		&m.commentInterfaces,
-		"comment-interfaces",
+		CommentInterfacesFlag,
 		false,
 		"require comments on all exported interfaces",
 	)
 
 	fs.BoolVar(
 		&m.noTestComments,
-		"no-test-comments",
+		NoTestCommentsFlag,
 		true,
 		"don't require comments on tests, benchmarks, examples, and fuzz tests",
 	)
 
 	fs.BoolVar(
 		&m.commentStructs,
-		"comment-structs",
+		CommentStructsFlag,
 		false,
 		"require comments on all exported structs",
 	)
