@@ -752,7 +752,7 @@ func (s *CommentMimicSuite) TestSkipTestComments() {
 		commentmimic.CommentAllExportedFuncsFlag: true,
 		commentmimic.CommentInterfacesFlag:       true,
 		commentmimic.CommentStructsFlag:          true,
-		commentmimic.NoTestCommentsFlag:          true,
+		commentmimic.CommentTestsFlag:            false,
 	}
 
 	fileMap := map[string]string{

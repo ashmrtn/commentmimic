@@ -1,4 +1,4 @@
-! exec commentmimic --comment-all-exported --no-test-comments not_commented_errors.go not_commented_errors_test.go
+! exec commentmimic --comment-all-exported not_commented_errors.go not_commented_errors_test.go
 stderr -count=4 'exported element ''Func[A-D]'' should be commented'
 
 -- not_commented_errors.go --

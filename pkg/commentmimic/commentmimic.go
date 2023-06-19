@@ -365,7 +365,7 @@ const (
 	CommentExportedFuncsFlag    = "comment-exported"
 	CommentAllExportedFuncsFlag = "comment-all-exported"
 	CommentInterfacesFlag       = "comment-interfaces"
-	NoTestCommentsFlag          = "no-test-comments"
+	CommentTestsFlag            = "comment-tests"
 	CommentStructsFlag          = "comment-structs"
 )
 
@@ -374,7 +374,7 @@ type mimic struct {
 	commentAllExportedFuncs bool
 	commentInterfaces       bool
 	commentStructs          bool
-	noTestComments          bool
+	commentTests            bool
 }
 
 func New() *analysis.Analyzer {
@@ -403,10 +403,10 @@ func New() *analysis.Analyzer {
 	)
 
 	fs.BoolVar(
-		&m.noTestComments,
-		NoTestCommentsFlag,
-		true,
-		"don't require comments on tests, benchmarks, examples, and fuzz tests",
+		&m.commentTests,
+		CommentTestsFlag,
+		false,
+		"require comments on tests, benchmarks, examples, and fuzz tests",
 	)
 
 	fs.BoolVar(
