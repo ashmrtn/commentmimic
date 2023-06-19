@@ -197,4 +197,31 @@ type testIface interface {
 
   func TestDoesntNeedComment(t *testing.T) {}
 `
+
+	TestComments = `package a_test
+
+  import (
+    "testing"
+  )
+
+  type BenchmarkInterface interface {} // want "exported element 'BenchmarkInterface' should be commented"
+
+  type ExampleInterface interface {} // want "exported element 'ExampleInterface' should be commented"
+
+  type FuzzInterface interface {} // want "exported element 'FuzzInterface' should be commented"
+
+  type TestInterface interface {} // want "exported element 'TestInterface' should be commented"
+
+  func BenchmarkNeedsComment(b *testing.B) {} // want "exported element 'BenchmarkNeedsComment' should be commented"
+
+  func ExportedElement() bool { // want "exported element 'ExportedElement' should be commented"
+    return false
+  }
+
+  func ExampleNeedsComment() {} // want "exported element 'ExampleNeedsComment' should be commented"
+
+  func FuzzNeedsComment(f *testing.F) {} // want "exported element 'FuzzNeedsComment' should be commented"
+
+  func TestNeedsComment(t *testing.T) {} // want "exported element 'TestNeedsComment' should be commented"
+`
 )
