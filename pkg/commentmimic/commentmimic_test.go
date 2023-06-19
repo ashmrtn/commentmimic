@@ -773,6 +773,62 @@ func (s *CommentMimicSuite) TestSkipTestComments() {
 	analysistest.Run(t, dir, mimic, "./...")
 }
 
+func (s *CommentMimicSuite) TestTestComments() {
+	table := []struct {
+		name  string
+		input string
+		flags map[string]bool
+	}{
+		{
+			name:  "DontRequireComments",
+			input: testdata.SkipTestComments,
+			flags: map[string]bool{
+				commentmimic.CommentExportedFuncsFlag:    true,
+				commentmimic.CommentAllExportedFuncsFlag: true,
+				commentmimic.CommentInterfacesFlag:       true,
+				commentmimic.CommentStructsFlag:          true,
+				commentmimic.CommentTestsFlag:            false,
+			},
+		},
+		{
+			name:  "RequireComments",
+			input: testdata.TestComments,
+			flags: map[string]bool{
+				commentmimic.CommentExportedFuncsFlag:    true,
+				commentmimic.CommentAllExportedFuncsFlag: true,
+				commentmimic.CommentInterfacesFlag:       true,
+				commentmimic.CommentStructsFlag:          true,
+				commentmimic.CommentTestsFlag:            true,
+			},
+		},
+	}
+
+	for _, test := range table {
+		test := test
+
+		s.T().Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
+			fileMap := map[string]string{
+				"a/a_test.go": test.input,
+			}
+
+			dir, cleanup, err := analysistest.WriteFiles(fileMap)
+			require.NoError(t, err)
+
+			defer cleanup()
+
+			mimic := commentmimic.New()
+
+			for flag, value := range test.flags {
+				require.NoError(t, mimic.Flags.Set(flag, strconv.FormatBool(value)))
+			}
+
+			analysistest.Run(t, dir, mimic, "./...")
+		})
+	}
+}
+
 func (s *CommentMimicSuite) TestFuncCommentErrors() {
 	element := "element"
 	base := generateCommentMimicCases(element)

@@ -236,7 +236,7 @@ func (m mimic) checkFuncDecl(pass *analysis.Pass, fun *ast.FuncDecl) {
 	commentExported := m.commentExportedFuncs
 	commentAllExported := m.commentAllExportedFuncs
 
-	if isTestFunc(pass.Fset, fun.Pos(), fun.Name.Name) {
+	if !m.commentTests && isTestFunc(pass.Fset, fun.Pos(), fun.Name.Name) {
 		commentExported = false
 		commentAllExported = false
 	}
